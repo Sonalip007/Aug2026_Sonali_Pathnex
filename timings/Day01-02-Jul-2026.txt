@@ -1,0 +1,5 @@
+
+2 hourse : read concept of IP adress & subnetting
+3-4 Hourse : watched video Github to EC2 & installed Github &AWS Successfully
+2 hours : roadmap overview
+
