@@ -1,0 +1,8 @@
+3 hours : Linux command
+Absolute path, relative path
+Top
+ls
+head
+tail
+chmod
+ln etc
