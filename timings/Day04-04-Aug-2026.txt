@@ -1,0 +1,12 @@
+2 hours : went through todays video once again
+
+commands we learnt today 
+chown
+chgrp
+tar 
+sed
+awk
+umask
+
+concept of public & private key & their use wrt baston server /jump server 
+how to create sudo user, change ID & Password
