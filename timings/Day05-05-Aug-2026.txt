@@ -1,0 +1,23 @@
+2 hours - Linux commands 
+2.5 hours - watched scripting video
+
+went through below concept 
+terraform - You write configuration files describing the infrastructure. Configuration is stored as code and can be reviewed
+terraform init
+terraform plan
+terraform apply
+terraform destroy
+kill & pkill  - to see process ID's "ps aux"
+grep - to serach pattern
+egrep - search multiple pattern
+egrep -iv  i remove case sensitive dependancy 
+she-bang : 
+#!/bin/bash  : written at begining of shell script which tells linux to execute the script using Bash interpreter which is located at path /bin/bash
+ 
+#!/usr/bin/python3   # Python interpreter
+
+wc -l  word count - l is line
+wget to download files from URL directly
+curl - to send data to & from server
+runlevel  init 0, 1to 6
+chronejob
