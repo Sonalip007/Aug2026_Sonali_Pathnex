@@ -1,0 +1,31 @@
+3 hours : read about Git & saw interview question
+2 hours : watched previous month (July) video
+
+command & concept learned : 
+git clone - if we dont have image of original file (clone download complete new file) from server
+git pull  - if we have copy of original data & if we want latest changes to pull
+
+in local repo:
+git branch branch_name- to make copy of own data
+git Checkout branch_name - to work on the branch we copied in our own system with above command
+for above two comments Git checkout -b branch_name
+
+git add .   : with this . changes willl be applied to all folders (folder inside folder) else we have to mention all folder name
+git commit -m "any msg at that time"  whatever change you do at that time put that message  mahanje he lakshat rahil ki tyaveli kay paristhiti hoti
+to add whatever added after Git add . command.. metion issue id in commit message with discription
+
+git push : always push after commit with this all changes pushed to main server
+Then generate pull request (PR) & add approval
+git status
+git log :
+
+concept to learn : code/repository forking, merge conflict (when you dont take pull of recent change), conflict marker(if we try to keep changes made
+by both users)
+
+git status
+git log : to see how many commits you have done -- from here you will get commit ID, date, authour here
+git commit -m filename (then no need to add .)
+If you do git show to commit ID, it will show what things are added(+++) or deleted(---) from it
+git rebase
+
+difference between merge & rebase
