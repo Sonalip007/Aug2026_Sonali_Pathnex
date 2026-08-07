@@ -1,0 +1,10 @@
+3 hours : read about AWS
+- Learnt about AWS Models Iaas, Pass, Saas
+- Different service about AWS like EC2, IAM, VPS, S3
+- Concept of VPC peering & Transit Gateway
+- Difference between Network gateway & NAT Gateway
+
+2 hours - watched past month AWS Video
+
+Planning for tommrrow :
+Will go through othet concepts of AWS
