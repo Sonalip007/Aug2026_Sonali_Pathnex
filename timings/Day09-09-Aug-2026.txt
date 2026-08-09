@@ -1,0 +1,192 @@
+4 hours leanrt about AWS security services & Database
+2 hour : watch previous lecture
+1 hour : Practical
+
+Topics learned today :
+
+12. AWS Shield
+AWS Shield is an AWS-managed service that protects applications from DDoS attacks.
+Think of it as a security guard standing in front of your application.
+What is a DDoS attack? Distributed Denial of Service.
+Imagine your website normally receives 100 requests/sec, Suddenly attackers send: 1,000,000 requests/second. The server may become overloaded:
+AWS Shield helps protect AWS applications against DDoS attacks 24*7
+
+Two Types of AWS Shield : 1. AWS Shield Standard(automatically available for AWS customers) 
+2. AWS Shield Advanced: offers enhanced protection, including real-time attack visibility.
+
+Protects resources like CloudFront, Route 53, and ELB. i.e all all customer facing tool
+
+extra : 
+Cloudfront : CloudFront helps deliver your website, images, videos, APIs & other content to users faster by serving it from locations closer to them
+Think of CloudFront as a nearby delivery center for your application like zepto
+Route 53 : Domain --> IP (Traffic Routing)
+ELB : Elastic Load Balancing : It is an AWS service that distributes incoming traffic across multiple servers/resources.
+
+=======================================
+
+13. AWS WAF (Web Application Firewall)
+Protects web applications from common security threats
+
+WAF protects your web application by checking incoming HTTP/HTTPS requests and allowing or blocking them based on rules.
+This WAF as a security guard checking web requests before they reach your application.
+
+Protects against SQL injection, cross-site scripting, and bots.
+SQL Injection : An attacker tries to manipulate a database through a web request
+Cross-Site Scripting (XSS) : An attacker tries to inject malicious scripts into a web page that other users will view.
+
+Integrates with CloudFront, ALB, and API Gateway
+
+ACL (Web Access Control List) : It is basically the collection of rules that WAF uses to decide whether to allow, block, or otherwise handle web req
+
+We can integrate WAF with Lambda, so that Lambda can automate a response
+
+=======================================
+14. Amazon GuardDuty
+Threat detection service for AWS environments.
+GuardDuty analyzes signals from different AWS sources and services.looks for suspicious behavior across your AWS environment.
+It  just detect the Suspicious But can not block it . SO Lambda might help modifying security controls or isolating a resource based on permission
+
+Key Points:
+o Continuously monitors AWS accounts for suspicious activity.
+o Uses machine learning and threat intelligence to detect anomalies.
+o Provides actionable findings to address security risks.
+o Integrates with CloudWatch for automatic response actions.
+o Helps identify unauthorized access, reconnaissance, and data exfiltration.
+
+GuardDuty vs CloudTrail: 
+CloudTrail Records AWS API activity & says "This action happened." 
+but , GuardDuty Analyzes security-related signals to detect threats. It basically says "This activity looks suspicious."
+
+WAF vs GuardDuty:
+WAF = Protect web requests
+GuardDuty = Detect threats
+
+=======================================
+
+15. Amazon Inspector
+
+What is Amazon Inspector?
+Amazon Inspector is an AWS vulnerability management service. (vulnerability : state of being open to harm, attack)
+Inspector checks your AWS workloads for security vulnerabilities and tells you what needs to be fixed.
+
+Whats Inspector look for ?
+Suppose your EC2 server has Linux, Apache, Java & You might have an outdated package then Inspector can identify this and generate a finding.
+Suppose your Docker image contains an outdated library or Imagine your CI/CD process, If Inspector identifies a serious vulnerability, it reports
+Whats is Finding : A finding is basically the security issue that Inspector reports.
+
+Inspector Vs GuardDuty:
+Inspector : Looks for: Vulnerabilities
+Guard Dut : Looks for: Threats/ suspicious activity
+
+Integrates with Amazon EventBridge and CloudWatch for automated alerts and response workflows.
+What is EventBridge doing? Amazon EventBridge can detect events from AWS services and route them to appropriate targets.
+
+=======================================
+16. AWS Key Management Service (KMS)
+
+Purpose: Manages encryption keys for securing data within AWS
+AWS KMS is a service used to create and manage encryption keys and control how those keys are used to protect data.
+
+Supports symmetric and asymmetric encryption keys.
+- Sysmmetric Keys : Same key use for encryption & decryption (same key to open & close lock)
+- Assymetric Keys : Different key use for encryption & decryption (public Key for encryption & Private key for decryption)
+
+o Automates key rotation to simplify key management.
+o Provides fine-grained access control for encryption keys.
+o Audits key usage via CloudTrail for compliance.
+
+=======================================
+17. AWS Systems Manager (SSM)
+
+AWS Systems Manager is an AWS service that helps us manage, monitor, access, and automate tasks on our servers and other AWS resources.
+Supports remote management of EC2 instance
+Helps with security and compliance auditing.
+Automates routine administrative tasks like software deployments.
+Provides centralized management with CloudWatch and CloudTrail.
+
+=======================================
+18. Amazon RDS (Relational Database Service)
+Managed relational database service for multiple database engines.
+
+what does A relational database means : It stores data in tables, using rows and columns.
+It perfromed automated backups so that data wont be loss
+Patch management : Database engines and underlying systems need updates and security patches.
+Scalability through Read Replicas and Multi-AZ : A Read Replica is mainly used to scale read traffic.
+
+you have multiple data engines such as SQL, MySQL, PostgreSQL, Oracle, MariaDB. You choose database engine u need & AWS manages infrastructure for u.
+
+What does AWS Manages :
+- Hardware/infrastructure provisioning, Database setup, Automated Backups, Software Patching, Monitoring, Storage management
+
+You still manages the things like
+- Database schema, Tables, Users/Permissions, Quries, Database performance tunning
+
+=======================================
+19. Amazon Aurora
+High-performance relational database compatible with MySQL and PostgreSQL.
+
+Provides up to 5x the performance of MySQL and 2x that of PostgreSQL (Aurora  is compatible with both of this MySQL & PostgreSQL 
+hence you can use aurora with existing  MySQL & PostgreSQL)
+Self-healing storage and automated backups.
+Aurora Serverless scales automatically based on demand.
+Multi-AZ deployments for high availability.
+Fully managed with automatic patching and scaling.
+Aurora is a managed service. You don't have to manually build database servers on EC2.
+
+=======================================
+
+20. Amazon DynamoDB
+Managed NoSQL database service for high-performance applications
+
+DynamoDB is used to store and retrieve data very quickly without using traditional tables with fixed relationships like MySQL or PostgreSQL.
+
+In RDS model  you write data in rows & columns like below
+Employee Table
+
+ID | Name   | Department
+-------------------------
+1  | Sonali | DevOps
+2  | Rahul  | Testing
+
+But in DynamoDB you write it like 
+{
+  "EmployeeID": "101",
+  "Name": "Sonali",
+  "Department": "DevOps"
+}
+So DynamoDB is more flexible with the structure of individual items.
+
+Provides fast, low-latency read and write operations
+Automatically scales throughput and storage.
+Supports both key-value and document data models.
+Built-in encryption at rest for security
+
+
+==================================== Summerised Form ===================
+
+security services of AWS & Database services of AWS
+
+1. AWS Shield : protection against DDos attack. on customer facing applications : Route 53, ELB, Cloud front
+What is a DDoS attack? Distributed Denial of Service.
+- Normal & Enhanced
+
+2. AWS WAF : Web Application firewall
+  - SQL injection   : An attacker tries to manipulate a database through a web request
+  - Cross Site Scripting : An attacker tries to inject malicious scripts into a web page that other users will view
+  
+3. Amazon GuardDuty  : analyzes suspicious signals from different AWS sources and services
+It  just detect the Suspicious But can not block it 
+
+4.  Amazon Inspector : Checks security vulnerabilities and tells you what needs to be fixed.
+server has Linux, Apache, Java & You might have an outdated package , abnormilitis in CI/CD pilpeline, Any oudated librabry in docker image
+
+5. AWS Key Management Service (KMS) : Manages encryption keys for securing data within AWS
+- Symettric & Assymetric
+
+6. Amazon RDS (Relational Database Service) : Manages relational database service, SQI, My SQL, postgreSQL, Oracle
+
+7. Amazon DynamoDB : Managed NoSQL database service for high-performance applications
+
+8. Amazon Aurora : High-performance relational database compatible with MySQL and PostgreSQL
+scales automatically based on demand. Can Take automated backups
+
