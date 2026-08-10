@@ -1,0 +1,143 @@
+3 hours : To study class 4 AWS Services
+1 hour : To study Snapshots sent on group
+1 hour : watch previous video
+1 hour : Parctice 
+
+Services learned today 
+Amazon Redshift : It is fully managed cloud data warehouse service from AWS.
+Redshift is used to store and analyze very large amounts of data, mainly for reporting, analytics, and business intelligence.
+Provides fast SQL-based querying for structured data.
+SUpports parallel query processing 
+Integrates with AWS analytics services like Glue and EMR. (wearhouse ahe mhatlyavar safai wale paije so Glue & EMR)
+Offers encryption for data security.
+
+===========================
+AWS DMS (Database Migration Service)
+Helps migrate databases to AWS with minimal downtime
+AWS DMS (Database Migration Service) is an AWS service used to move or replicate data from one database to another.
+Imagine your production database contains 1 TB of data.  
+because the application could be unavailable for a long time. (karan data copy karayla time janar let say 2/3 days ani parallely existing 
+database madhey changes hot rahanar.. existing chnages pan copy zhale paije). 
+Instead, DMS can continuously replicate changes while the source database remains available.
+
+Full Load : DMS copies the existing data from source to target. e.g. if 100 Million records it will copy all 100 Million records
+CDC — Change Data Capture : After the initial copy, DMS can capture changes happening on the source database and replicate them to the target.
+This helps quick migration & reduces downtime
+- Supports migrations between homogeneous and heterogeneous databases
+- Continuous data replication to ensure data integrity.
+- Monitors migration progress and provides detailed reports.
+- Supports many database engines, including Oracle, MySQL, and SQL Server
+
+7 R's in migration : Rehost, Replatform, Repurchase,  Refactor, Retire, Retain, Relocate
+
+===========================
+AWS Batch
+why it is called as Batch : Because you're processing a group/batch of work, rather than waiting for a user to request each task individually.
+Handles thousands of batch computing jobs at any scale
+Suppose every night you need to process customer usage data. You need to calculate: How much data did each customer use today?
+That's a huge amount of work.You can give this work to AWS Batch: Many jobs can be processed using the available compute resources.
+
+===========================
+AWS Glue
+It is Serverless data integrationservice . It helps to Transform, clean & Prepares data without managing server
+Can be integrated with redshift, S3 etc
+Supports bith Python & Scala for scripting
+
+===========================
+Amazon Elastic File System (EFS)
+Amazon EFS (Elastic File System) is basically a shared folder in AWS that multiple servers can access at the same time
+EBS vs EFS vs NFS : 
+EBS = hard disk attached to EC2 (Elastic Block Store)
+EFS = shared folder
+NFS = technology/protocol used to share files over a network
+===========================
+AWS Elastic Beanstalk
+- Platform-as-a-Service (PaaS) for deploying and managing applications
+- Supports multiple programming languages, including Java, Python, Node.js,
+and more
+- Automatically handles deployment, scaling, and monitoring
+
+===========================
+Amazon CloudFront
+Think of CloudFront as a fast delivery service for your website/application content. CloudFront is AWS's Content Delivery Network (CDN).
+Its main purpose is to deliver content to users faster by serving it from locations closer to them.
+An Edge Location is a location where CloudFront can cache and deliver content.
+Provides DDoS protection and encryption for security.
+
+===========================
+AWS Snowball
+Data transport solution for securely transferring large amounts of data to AWS.
+Snowball = AWS sends you a physical box → you put your data in it → send the box back → AWS transfers the data into AWS.
+Imagine your company has 100 TB of data sitting in an on-premises data center. But transferring 100 TB over the internet could take a very long time,
+depending on your network bandwidth. You could send them one by one through a small delivery service. Or you could put all 1,000 boxes into a large
+truck. 
+Snowball is similar to large truck for your data.
+===========================
+AWS CodePipeline:
+Think of AWS CodePipeline as an automatic conveyor belt for your software.
+When a developer changes code, CodePipeline can automatically move that code through different stages until it is deployed.
+Instead of a DevOps engineer manually doing each step, the pipeline automates the flow.
+
+AWS CodePipeline is a managed CI/CD service used to automate the software release process.
+
+===========================
+AWS CodeBuild
+Think of AWS CodeBuild as a worker inside your CI/CD pipeline whose job is to build your application and run tests.
+It automatically compiles or builds application code, installs dependencies, and runs automated tests.
+We can also use CodeBuild to create Docker images
+
+===========================
+AWS CodeDeploy
+Think of AWS CodeDeploy as the person responsible for putting your new application version onto the servers.
+
+CodePipeline = manages the complete journey
+CodeBuild = builds and tests the application
+CodeDeploy = deploys the application
+
+Suppose your application currently has Version 1, A developer creates Version 2. You need to put Version 2 onto your servers.
+Instead of manually doing it, CodeDeploy can automate the deployment process.
+
+Deployement Statergies :
+Rolling : Rolling means replacing the old version little by little. Instead of updating all 4 at once, you update them gradually
+Blue Green Deployement : Keep the old environment and create a completely separate new environment.
+Canary Deployement : Send the new version to a small percentage of users first check how it work then deploy rest gradually
+===========================
+AWS X-Ray:
+Think of AWS X-Ray as a detective for your application
+
+When your application has many services and something becomes slow or fails, X-Ray helps you trace a request and find where the problem happened.
+
+ClouldWatch Vs X-Ray
+CloudEatch : "How is my system performing?" : gives you CPU utilization, memory usage, Logs, Error count, alarm - tells you CPU is high
+X-Ray : "Where did this particular request go, and in which part it become slow or fail
+
+
+============================ In short  ========================
+
+Amazon Redshift  : It is fully managed cloud data warehouse service from AWS.
+AWS DMS (Database Migration Service)
+Full Load : DMS copies the existing data from source to target
+CDC : Change Data Capture : After the initial copy, DMS can capture changes happening on the source database 
+and replicate them to the target.
+AWS Batch : why batch ? processing a group/batch of work
+ASW Glue :  serverless application used to transform, Clear & prepare data
+Amazon Elastic File System (EFS): is basically a shared folder in AWS
+EBS = hard disk attached to EC2 (Elastic Block Store)
+EFS = shared folder
+NFS = technology/protocol used to share files over a network
+AWS Elastic Beanstalk :Platform-as-a-Service (PaaS) for deploying and managing applications
+automatically handle deployement
+Amazon CloudFront : fast delivery service for your website/application content.
+deliver content to users faster by serving it from locations closer to them.
+AWS Snowball : for securely transferring large amounts of data to & from  AWS
+CodePipeline = manages the complete journey
+CodeBuild = builds and tests the application
+CodeDeploy = deploys the application : responsible for putting your new application version
+
+Deployement Statergies :
+Rolling : Rolling means replacing the old version little by little. Instead of updating all at once, you update them gradually
+Blue Green Deployement : Keep the old environment and create a completely separate new environment.
+Canary Deployement : Send the new version to a small percentage of users first check how it work then deploy rest gradually
+
+AWS X-Ray: detective for your application
+

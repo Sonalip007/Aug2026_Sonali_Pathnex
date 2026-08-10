@@ -1,0 +1,44 @@
+3 hours : AWS service
+2 hours : aws previous batch recording 
+2 hours : self study & revision of previous lectures
+1 hour  : Handson practice 
+
+In todays lecture we came to know below concepts 
+
+Landing Zone = An AWS Landing Zone is a pre-configured, secure, and scalable AWS environment that an organization sets up before deploying 
+its applications 
+
+Control Tower = AWS Control Tower is an AWS service that helps you set up and govern a multi-account AWS environment.
+
+SCP in control power. SCP (Service Control Policy)
+IAM policy says what a user or role CAN do.
+SCP says what an AWS account is ALLOWED to do at the organization level.
+
+What is S3 Versioning?  delet marker
+S3 Versioning allows you to keep multiple versions of the same object in an S3 bucket.
+
+Route 53 : DNS to IP
+
+Main functions :
+1. DNS Registartion :Buy & manage domain name like mywebsite.com
+2. DNS Resolution : Converts domain name in to IP adress
+3. Health Checkup : Continuosly monitor applications or websites
+4.Traffic Routing : Route traffic based on policies
+
+Different types of routing policies 
+- Simple Routing   : One destination
+- Weighted routing : Split Traffic
+- Failover         : Automatically switch to backup server if the primary one fails
+- Geolocation      : Route traffic based on users country or region
+- Latency Based    : Route 53 sends users to the AWS region that provides the lowest network latency.
+- Multivalue Answer Routing : Returns multiple healthy IP addresses for a DNS name
+
+Important Route 53 records :
+- A record    : Maps a domain name to an IPv4 address
+- AAAA record : Maps a domain name to an IPv6 address
+- CNAME       : Maps one domain name to another domain name.
+- Alias Record: Think it as of shortcut(short name to your domain adress)
+
+AWS CloudTrail is an auditing and logging service that records API activity in your AWS environment.
+Amazon CloudWatch is a monitoring service in AWS.monitoring dashboard of your AWS environment
+
