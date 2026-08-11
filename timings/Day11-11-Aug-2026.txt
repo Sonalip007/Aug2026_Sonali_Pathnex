@@ -1,0 +1,243 @@
+3 hours : studied docker 
+2 hour s: past lecture
+1 hour : practice
+
+Study I did today..
+Monolithic vs Microservice :
+
+Monolithic:
+A monolith is one application where most functionality is built and deployed together.
+Anything fails means whole structure get destroy.
+
+2. Microservices
+you split the application into smaller, independently deployable services.
+If any thing fails means that part only impacted rest will work fine 
+
+So Docker is Microservice :
+
+Analogy is : Docker File --> Docker Image --> Docker Engine --> Container
+
+Docker :
+- Docker is open source platform
+- Docker can Build Images, create containers, start/stop containers, Manage containers, Push/Pull images
+
+====================================================
+1. Docker File:(consider it as Recipe to create docker image)
+Script with series of instructions which says how to build Docker Image 
+From    - Tells which Base image needs to be use  - BuildTime
+WORKDIR - Set Working Directory e.g /app
+COPY    - Copy local File in to (/app) inside image   - BuildTime
+RUN     - Execute command while building the image  - BuildTime
+ENTRYPOINT - Defines Main executable - Runtime
+CMD     - Default command/instruction/arguments when container starts - RunTime (What should happen when the container starts?)
+
+
+IMP : CMD Can be override But ENTRYPOINT doesn't easily(requires special docker option to override)
+
+e.g
+FROM ubuntu:22.04
+ENTRYPOINT ["echo"]
+CMD ["Hello Pathnex"]   
+- o/p of docker run myapp   --> Hello Pathnex
+
+why bcz it combines arguments "Hello Pathnex" with instruction as echo . echo means Print it. hence it is printing Hello Pathnex
+
+- but o/p of docker run myapp "Hello Docker"  --> Hello Docker
+why bcz it passes "Hello Docker" as argument which overrides "Hello Pathnex" with "Hello Docker" (as we know CMD can be obverride)
+& Then combines arguments "Hello Pathnex" with instruction as echo . echo means Print it. hence it is printing Hello Pathnex
+
+
+another example :
+ENTRYPOINT ["python"]
+CMD ["app.py"]
+WHile running docker run myapp here it will do python app.py which means it will run app.py using python
+
+IMP : When you run a Docker container, Docker uses ENTRYPOINT first, then combines it with CMD
+
+        docker run
+             ↓
+      Check ENTRYPOINT
+             ↓
+      "What program?"
+             ↓
+          python
+             +
+      Check CMD
+             ↓
+      "Default argument?"
+             ↓
+          app.py
+             ↓
+       python app.py
+
+Q. What if there is only CMD?
+then Docker uses CMD as the default command  :  CMD ["python", "app.py"]
+
+====================================================
+
+2. Docker Image : (consider it as packaged food)
+- A docker with its dependencies called as Docker Image (A Docker image is a packaged version of your application that contains everything needed to run it
+
+Think of it as a template or blueprint for creating containers.
+====================================================
+
+3. Docker Engine : (Consider it as the kitchen/equipment that does the actual work)
+software that actually builds container and runs Container
+
+When you do 
+A. docker build -t myapp .   -- Docker Engine builds the image
+B. docker run myapp          -- Docker Engine creates and starts a container from that image.
+	
+In Simple words:
+Dockerfile = recipe
+Image = packaged food
+Docker Engine = the kitchen/equipment that does the actual work. 👨‍🍳
+Container = Final Prepared food
+
+
+What does Docker Engine do?
+
+Docker Engine is responsible for things like:
+
+Building images from Dockerfiles
+Creating containers from images
+Starting and stopping containers
+Managing container resources
+Managing container networking
+Managing container storage
+
+====================================================
+
+4. Container : (consider it as prepared Food)
+- It is a running instance of Docker image
+- Since it uses OS of host, containers are lightweight 
+Containers are isolated from the host system, but share the same OS kernel, making them lightweight compared
+
+====================================================
+
+5. Docker Compose : Docker Compose is a tool used to define and run multiple Docker containers together as one application.
+
+Docker                         vs             Docker Compose
+
+Manages individual containers/images	      Manages multiple containers/services
+Command: docker run	                      Command: docker compose up
+Good for one/few containers	              Good for multi-container applications
+Uses Dockerfiles to build images	      Uses Compose YAML to define services
+
+====================================================
+6. Docker Registry : storage place for Docker images. A Docker registry is where Docker images are stored.
+Registries allow you
+to push and pull images to and from remote repositories.
+
+====================================================
+7. Docker Networking 
+Docker containers are isolated by default
+and you can control how they communicate with each other and with the outside world
+Default Network Types: Primary: Bridge, Host, overlay, None     additional : macvlan, ipvlan
+Bridge type is default one 
+
+A. Bridge : Suppose you have 2 services or 2 containers, They connected to the same bridge network can communicate with each other.
+   Default network for standalone containers.
+B. Host : The container shares the host machine's network.
+C. Overlay: Used for multi-host networking in Swarm mode. (Docker's orchestration tool).
+   allows containers running on different Docker hosts/servers to communicate with each other.
+D. None : The container has essentially no network connectivity. Useful when a container doesn't need networking
+====================================================
+8. Docker Volumes:
+
+By default, all data in a container is ephemeral (i.e., lost when the container is removed), 
+but volumes allow you to persist/keep data across container restarts or even container removals. 
+Volumes can also be shared between containers.
+
+====================================================
+9. Docker Swarm and Kubernetes
+Both Docker Swarm and Kubernetes are used to manage multiple containers across multiple servers
+The main difference is that Kubernetes is much more feature-rich and widely used for production container orchestration.
+
+what problem are they solving?
+
+Imagine you have 100 containers running across several servers.
+
+You need something to:
+
+Deploy containers
+Restart failed containers
+Scale containers up/down
+Distribute containers across servers
+Perform rolling updates
+Provide networking
+Manage services
+
+That's called container orchestration
+
+====================================================
+
+10. Benefits of Docker
+• Portability: Containers run the same regardless of the host system.
+• Efficiency: Containers are lightweight and start up quickly.
+• Isolation: Applications and services run in isolated environments, reducing
+dependency conflicts.
+• Version Control: Docker images are versioned, so you can easily roll back to
+previous versions.
+• CI/CD Integration: Docker integrates well with continuous integration and
+deployment pipelines.
+
+====================================================
+
+11. Common Docker Commands
+• docker build: Builds a Docker image from a Docker file.
+• docker run: Runs a container from an image.
+• docker ps: Lists running containers.
+• docker stop: Stops a running container.
+• docker rm: Removes a stopped container.
+• docker pull: Pulls an image from a registry.
+• docker push: Pushes an image to a registry.
+
+====================================================
+12. Use Cases For Docker :
+- Microservices: Docker is often used in microservice architectures, where each service runs in its own container.
+- DevOps & CI/CD: Docker containers can be easily integrated into CI/CD pipelines to provide consistent environments for testing and production.
+- Cloud Deployment: Docker is widely used in cloud environments for application deployment and scaling.
+- Environment Consistency: Docker helps ensure that the environment for development, testing, and production are consistent.
+
+====================================================
+Q. How to optimize docker image size 
+
+To optimize Docker image size, you can:
+
+- Use a smaller base image — e.g., Alpine or slim images.
+- Use multi-stage builds — keep build tools out of the final image.
+- Remove unnecessary packages and files.
+- Use .dockerignore — don't copy unnecessary files into the image.
+- Combine RUN commands where appropriate to reduce layers.
+- Clean package caches after installing packages.
+
+====================================================
+Q. Multistage docker Build 
+
+====================================================
+Commands : to delet unwanted files & keep space clean
+
+docker system prune
+Removes stopped containers, unused networks, dangling images, and unused volumes.
+
+docker system prune -a
+More aggressive — removes all unused images, not just dangling ones.
+
+docker container prune
+Removes stopped containers.
+
+docker image prune
+Removes dangling images (images not tagged or in use).
+
+docker image prune -a
+Removes all unused images, including non-dangling ones.
+
+docker volume prune
+Removes unused volumes.
+
+docker network prune
+Removes unused networks.
+
+docker builder prune
+Removes build cache used during image builds.
