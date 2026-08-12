@@ -1,0 +1,154 @@
+3hours : Kubernetes & its architecture
+2 hours : watch old video 
+1 hour : Practical
+
+What is Kubernetes : It is container orchestration platform.  
+e.g In live orchestra One person manages group of musicians here Kubernetes is that person who manages all containers 
+
+======================================
+Why do we need Kubernetes?
+
+Imagine you have one application running in 10 containers across several servers.
+
+You need something to:
+
+Start containers
+Restart them if they fail
+Decide which server should run a container
+Scale from 10 containers to 50
+Perform rolling updates
+Provide networking between containers
+Manage configuration and secrets
+Manage storage
+
+Kubernetes automates these tasks.
+
+======================================
+
+What is Pod : It is smallest Deployable unit in Kubernetes (deployable is VIP word here)
+Pod has multiple containers in it
+
+======================================
+Imp Elements of Kubernetes :
+
+Control Plane
+│
+├── API Server       → receives requests
+├── etcd             → stores cluster state
+├── Scheduler        → chooses a worker node for Pods
+└── Controller       → maintains desired state
+
+Worker Node
+│
+├── Kubelet          → manages Pods on the node(for networking & Traffic routing)
+├── Kubeproxy        → Manages communication with master node(control plane)
+├── Container Runtime→ runs containers
+└── Pods             → run applications
+
+=============================================
+Any person lets say did or user typed kubectl create pod then how flow will go like :
+
+1. The request will reach to API Server 
+   - It Authenticate/authorize the request 
+   - Validate it 
+
+2. ETCD (Brain of Kuberneters) 
+   - It is like database 
+   - So when request comes to ETCD from API server it creates entry of it like Pods need to be create 
+   - Once entry is been added in database ETDC intimate/ send response back to API server 
+
+3. Scheduler
+   - Now API will look for because his job is to find Node so that node can be deploy on it 
+   - Once request reaches scheduler it reply back to API server saying I found node where node can be deployed
+
+4. Kublet
+   - Now API server see that node.. where Kublet is present
+   - He tells kublet that I have a job for you. schedule this pod on your node
+   - It will schedule/create pod on this node & send respose back to the API server 
+
+5. API server then again talk to ETDC saying pod is been created. on node"X"
+6. ETDC will maintain the same in its database
+7. API server then inform user that your request is fulfilled
+
+=============================================
+Detail function of each component:
+
+API Server :
+Authentication
+Authorization
+Request validation
+Admission control
+Reading/writing Kubernetes objects
+Communication with other Kubernetes components
+
+----------------
+ETCD : 
+
+etcd is the key-value database used by Kubernetes to store cluster state.
+
+It stores information such as:
+Pods
+Deployments
+Services
+ConfigMaps
+Secrets
+Nodes
+Cluster configuration
+Desired state
+------------------
+Controller Manager
+The Controller Manager makes sure the actual state matches the desired state.
+
+
+There are several controllers inside controllers, such as:
+
+Deployment Controller
+ReplicaSet Controller
+Node Controller
+Job Controller
+EndpointSlice-related controllers
+Namespace Controller
+-----------------
+
+Scheduler :
+Decides "Which worker node should run this Pod?"
+
+It evaluates available nodes based on things such as:
+
+CPU
+Memory
+Node availability
+Taints and tolerations
+Node affinity
+Pod affinity/anti-affinity
+Resource requirements
+Other scheduling constraints
+----------------
+
+Worker nodes : 
+
+Kubelet
+The Kubelet is the agent running on every worker node. "The manager responsible for Pods on my node."
+Kubelet also continuously monitors the containers/Pods and reports status back to the API
+----------------
+Container Runtime
+The Container Runtime actually runs the containers.
+if pod say --> image:nginx
+the container runtime pulls the image and starts the container.
+----------------
+Kube proxy 
+kube-proxy runs on worker nodes and helps implement Kubernetes Service networking.
+kube-proxy helps implement the networking rules that direct traffic toward the appropriate backend Pods.
+ ---------------
+
+Pods
+
+A Pod is the smallest deployable unit in Kubernetes.
+Containers inside the same Pod share:
+
+Network namespace/IP
+Port space
+Volumes, when configured
+
+
+
