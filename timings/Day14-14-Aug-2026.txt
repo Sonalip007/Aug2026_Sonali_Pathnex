@@ -1,0 +1,273 @@
+3 hours: on learning kubernetes concepts
+2 hours : went through previous lecture	
+1 hour : practical 
+
+Kubernetes Namespace:
+
+Q. What is Kubernetes Namespace:
+A Namespace is like a separate room or department inside a Kubernetes cluster where you can organize and separate your resources
+Imagine your Kubernetes cluster is a large office building:
+🏢 Kubernetes Cluster
+│
+├── 🏠 Development Department
+│     ├── Web App
+│     ├── API
+│     └── Database
+│
+├── 🏠 Testing Department
+│     ├── Web App
+│     ├── API
+│     └── Database
+│
+└── 🏠 Production Department
+      ├── Web App
+      ├── API
+      └── Database
+
+	  
+Q.Why do we need Namespaces?
+Imagine you have 100 Pods in one Kubernetes cluster.
+Without namespaces, It becomes difficult to organize and manage them. like below.
+Cluster
+│
+├── web-pod
+├── api-pod
+├── database-pod
+├── web-pod
+├── api-pod
+├── test-pod
+├── web-pod
+└── ...
+
+It becomes difficult to organize and manage them.
+
+With namespaces
+Cluster
+│
+├── dev
+│    ├── web-pod
+│    ├── api-pod
+│
+├── test
+│    ├── web-pod
+│    ├── api-pod
+│
+└── prod
+     ├── web-pod
+     ├── api-pod
+	 
+- Namespaces are inside the same Kubernetes cluster.
+- Can two Namespaces have the same resource name?	  yes
+
+dev namespace
+   └── web
+
+prod namespace
+   └── web
+
+Think it of like : 
+Building
+│
+├── Room 101 → Sonali
+└── Room 102 → Sonali
+
+You can create namesapce using : kubectl create namespace name_of_namespace
+check namsespace using         : kubectl get namespaces or kubectl get ns
+
+
+Q. Why do we use Namespaces?
+
+| Purpose                     | Simple meaning                                   |
+| --------------------------- | ------------------------------------------------ |
+| **Organizing resources**    | Keep Pods, Services, Deployments, etc. organized |
+| **Isolating applications**  | Separate applications/environments logically     |
+| **Managing access**         | Use RBAC to control who can access what          |
+| **Managing quotas**         | Limit CPU, memory, number of Pods, etc.          |
+| **Multi-team environments** | Different teams can use different namespaces     |
+
+Q. Deafult namespaces in kubernetes:
+
+| Namespace           | Simple meaning                                               |
+| ------------------- | ------------------------------------------------------------ |
+| **default**         | Where resources go when you don't specify a namespace        |
+| **kube-system**     | Contains important Kubernetes system components              |
+| **kube-public**     | Contains information that can generally be read by all users |
+| **kube-node-lease** | Helps Kubernetes track whether nodes are alive               |
+
+Default : If you dont specify namespace for any resource they go to default namespace
+kube-system : This contains Kubernetes system components and add-ons.
+kube-public : contains info readable by all users
+kube-node-lease : Helps to track if nodes are alive
+
+============================================================
+
+Services : A Service provides a stable way for users or other Pods to communicate with a group of Pods
+It defines logical group of pods & provides stable way to access them
+
+The main problem is that Pods are temporary. i.e their IP adress change when they restart 
+If 1 pod crashes kubernetes create new pod . but in this its IP will change 
+so we dont want our application to depend on ip adress as it changes..hence we use service
+
+e.g Think of Service like a Receptionist Imagine a company has 3 employees
+Their seating position can change or 1 of employee might leave . but the company's main phone number stays the same
+The Service is like that phone number:The caller doesn't need to know the individual Pod IPs They simply contact the Service.
+
+
+What does a Service provide?
+1. Stable IP  : Pods can change IP addresses, But the Service has a stable virtual IP. 
+Applications communicate with the Service instead of directly using Pod IPs.
+2. DNS name : Kubernetes automatically provides DNS for Services.(user can type jus https:google it will auto map ip & take you there)
+3. Load balancing : Traffic Distribution
+
+Let's use one simple example: a web application running in Kubernetes
+You have Kubernetes cluter like below. but question is How can someone reach this pods? thats where service comes in to picture
+                Kubernetes Cluster
+                     │
+              ┌──────┴──────┐
+              │              │
+            Node 1         Node 2
+              │              │
+            Pod A           Pod B
+              │              │
+              └──────┬──────┘
+                     │
+                  Service
+				  
+				  
+
+- ClusterIP: Imagine your Kubernetes cluster is a company building & Your backend application is inside the building.
+Only people inside the building can reach it. hence it is internal communication 
+
+- NodePort — "Open a door on the building" : Now suppose someone outside wants to access your application.
+You open a specific port on the Kubernetes nodes. Think it of like Node=Building. Node port = Door Number
+Someone can reach the application using: Node IP + NodePort  e.g 18.61.25.135:30080  (where left side is node & right side is nodeport)
+
+- Load Balancer : Now imagine you have a real production application & you dont want user to remember this number 18.61.25.135:30080
+It is a external service to reach my application 
+
+- External Name : This service does NOT expose your Pods to the internet. Instead, it gives an external service (Kubernetes name → External DNS name)
+
+- headless Service : It doesn't have  Service IP(ClusterIP.). Instead, DNS returns the individual Pod IP addresses.
+Sometimes the application needs to know each individual Pod, rather than sending traffic through one Service IP.
+
+Q. Service Types In Kubernetes
+| Type             | Simple meaning                                  |
+| ---------------- | ----------------------------------------------- |
+| **ClusterIP**    | Use for internal communicaion.No external access| <-- Deafult
+| **NodePort**     | Exposes the Service through a port on each node | <- Basic external access provided by opening a static port
+| **LoadBalancer** | Creates/uses an external cloud load balancer    | <- Commonly used in cloud environments such as AWS EKS.
+| **ExternalName** | Maps a Service name to an external DNS name     |
+
+Sevice vs Pod
+ | Pod                               | Service                          |
+| --------------------------------- | -------------------------------- |
+| Runs the application container(s) | Provides stable access to Pods   |
+| Has an IP address                 | Has a stable virtual IP/DNS name |
+| Can be recreated                  | Provides a stable endpoint       |
+| IP can change                     | Service endpoint remains stable  |
+| Runs workload                     | Routes traffic to selected Pods  |
+
+============================================================================
+
+Deployments:
+A Deployment in Kubernetes manages a group of Pods and controls their lifecycle.
+It ensures the desired number of Pods are running at all times and automatically
+if any pod died it auto replaces failed Pods.
+A Deployment provides:
+o Scaling (increase or decrease number of Pods)
+o Rolling updates (update Pods without downtime)
+o Rollback (revert to a previous version if needed)
+
+==========================================================
+ReplicaSets:
+o A ReplicaSet ensures that a specified number of pod replicas are running at
+any given time. It works alongside Deployments to manage the scaling and
+health of applications.
+
+suppose 3 pods are running & 1 of them crashes. it will sech desired pods :3 & actual pods : 2
+so it creates another pod to maintain count of 3
+
+==============================================================
+Stateful set
+
+A StatefulSet is a Kubernetes resource used to manage stateful applications where each Pod needs a stable identity, stable network name,
+or persistent storage.
+
+Think of it as:
+Deployment = replaceable workers
+StatefulSet = workers with permanent identities
+
+In deployement : You don't really care which Pod is which. If any single pod dies it create new pod . The identity changed. which is perfectly fine
+but in stateful set, identities of pods are stable Each Pod can have its own identity, its own storage
+========================================================
+
+Daemonset : Makesure that one pod rinning on all nodes in the cluster
+========================================================
+Job & Cronejob : A Job is used when you want a Pod to run a task and finish successfully. A CronJob is a Job that runs according to a schedule
+
+========================================================
+Ingress :Ingress is a way to control HTTP/HTTPS traffic coming from outside the Kubernetes cluster and route it to different Services inside 
+the cluster.
+
+In load balancer, suppose we have frontend, backend, admin service we need 3 load balancers which are exposed to external world. 
+Its job is primarily to forward traffic to the backends configured for that Service.
+So if you dont want seperate load balancers. Yo can use one loadbalancer followed by ingress
+Now the Ingress Controller makes the routing decision.
+Based on the hostname/path, it decides which Kubernetes Service should receive this HTTP request
+
+suppose : user request is https://myapp.com/api/users
+The traffic flow will be :
+User
+  |
+  | HTTPS
+  ↓
+Cloud External Load Balancer
+  |
+  ↓
+Ingress Controller
+  |
+  | sees /api
+  ↓
+backend-service
+  |
+  ↓
+backend-pod
+
+The Ingress Controller sees: Host: myapp.com    Path: /api/users
+and applies your Ingress rule: /api → backend-service. like this  he come to know it is backend service
+
+==============================================================
+
+Kubernetes Networking
+• Pod-to-Pod Networking:
+o Pods in a Kubernetes cluster can communicate with each other over a flat
+network. Each pod is assigned a unique IP address within the cluster.
+• Service Discovery:
+o Kubernetes automatically assigns a DNS name to services, allowing pods to
+easily discover and access each other by name.
+• Network Policies:
+o Kubernetes provides Network Policies to control the communication between
+pods based on labels and namespaces, enhancing security.
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX=========== In short =======XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx
+Namespace
+- Namespaces divide one Kubernetes cluster into separate logical environments.
+- Remember all namespaces are within/inside same cluster
+
+purpose : organize resource, isolation, managing access/quotas, multi team env
+
+Default : If you dont specify namespace for any resource they go to default namespace
+kube-system : This contains Kubernetes system components and add-ons.
+kube-public : contains info readable by all users
+kube-node-lease : Helps to track if nodes are alive
+
+Service : It defines logical group of pods & provides stable way to access them
+It provide stable IP Adress, DNS, Load Balancing 
+Types : ClusterIP, Nodeport, Load Balancer, External Name, Headless service 
+
+Deployments: help to manage pods & their life cycle. scaling, rolling update, rollback
+ReplicaSets : ensures that a specified number of pod replicas are running
+Daemonset : Makesure that one pod rinning on all nodes in the cluster
+Job & Cronejob : A Job is used when you want a Pod to run a task and finish successfully. A CronJob is a Job that runs according to a schedule
+Ingress : Manages HTTP/HTTPS Traffic and route it to different Services inside the cluster. lies after load balancer
+
