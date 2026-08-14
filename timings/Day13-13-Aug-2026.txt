@@ -1,0 +1,24 @@
+Today we learned how to create Kubernetes cluster
+Spend 3 hours in learning that 
+1 hour in practical
+2 hours last month video
+
+Cluster creation 
+- config option custom (disable EKS auto mode)
+- cluster config - name to cluster --> added role
+- Kubernetes - version support : standard(14months) & extended(extend another one year)
+- Dev--> QA-->SQA-->UTA-->PROD  (Dev version ahead of UTA by 1 & of PROAD by 2)
+- Under VPC we added 2 subnets(why 2 as if one availability zone AZ goes down another can be still active)
+- Selected Addons 
+
+Time to create worker node for add on  
+Node groups --> add
+- worker node = EC2 instances
+AMI Type, Capacity Type(spoton, ondemand), Instance type, Disc Size
+Node group scaling config : Desired size , Minimum & Max 
+
+Authenticate : who are you - Checks your identity
+Authorization : what you can do - Checks your permissions
+
+​​Vertical scaling - Increasing resources on same machine; 
+Horizontal scaling - Creating new machine with same parent pod
