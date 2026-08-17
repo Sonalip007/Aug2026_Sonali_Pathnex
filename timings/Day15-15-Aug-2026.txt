@@ -1,0 +1,4 @@
+3 hours : kubernetes cluster creation (Theory)
+3 hours : Practical & undersatnding of concept
+1 hour : troubleshooting & learing
+

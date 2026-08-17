@@ -1,0 +1,93 @@
+4 hours : Theory of creation of Kubernetes cluster
+2 hours : Practical
+3 hours : watched last month video 
+
+Useful for interview as well
+
+-Make terraform manually & import that 
+-Keep all the terraform files in one folder & from that location do cmd 
+-terraform plan
+-terraform apply -auto-approve  (don't do auto-approve  instead do plan & then apply) Your cluster will be created
+-while doing kgp -A (get pod command) you will get error bcz you have to update config file
+aws eks update-kubeconfig --name Pathnex --region ap-south-1 (Pathnex is cluster name - casesensitive, & region anme)
+- Now do "kubectl get nodes"   <-- you can see node 
+& with kgp -A   <-- You can see all pods
+- Then we open multiple panes to track what is happening ..also open two tabs of AWS
+- Our pod was stucked in crashLoopBackoff (ebs one) 1/6 were ready
+- To Troubleshoot on any pod we do "k describe pod <name_of_pod> -n kubesystem".. then under EVENT we can see actual failure . note kubesystem is namespace here 
+if you directly want to check event of pod you can do "k events pod <name_of_pod>"  (it will give pod specific events)
+  also we can troubleshoot using "k logs <name_of_pod> - n kubesystem" 
+ so we have above 3 imp commands to check pod failures 
+- then we came to know that error came as we didn't apply role on it
+- we were trying to open same two terraform from same PC.. above below  it will give state lock error saying terraform acquires state lock to protect the state from being written by multiple users. we can ignore the same by applying command "terraform apply -lock=false" (at one time 2 users can not use). it will pop up one window do yes  (note if we open two terraform another will be available for 20min only)
+- in our code, pod identity(it is add on) was creating but in the middle it was stucked in ebs_csi creation.dur to which one pod wasn't created. so we want pod identity to create first & csi later for this we use depends on feature. so we went in addons & under that where we created ebs_csi we changed dependwsw on block. we added one line under depends_on i.e. asw_eks_addon.pod_identity
+
+what it will do :it will create pod identity 1st & make sure it is complete post completion it go for ebs_csi.
+depends on jiske andar likha hoga wo badmein Banega..our jo likha hoga depends on mein wo pehele banega.
+Note : in addons change cluster name at every place. whenever we do change do terraform apply after that
+ - Two see behaviour of pods& nodes from multiple pane apart from main local pane ..In one pane use command "kgp -A -w" in another pane "kgn -A -w" ( w for watching state/status) 
+
+
+additional note : 
+- we do "k logs <name_of_pod> - n kubesystem" where kubesystem is namespace . now if we dont want to write namespace after  -n everytime .. do "kubens kube-system"  (which make add in ns- namespace)  then simply do "k logs <name_of_pod") 
+- To check container log k logs <name_of_pod> -c <container_name> (where -c is for container. since we added namespace we didnt write)
+
+===========================Cluster created till here & all pods/nodes were up ===========================
+
+
+- database always made using statefulset
+
+now to create application & make it out for user interaction we did following things 
+==============================================================================================
+- Copy terraform files in to different folders (why? bcz we want to create the things for application
+ask chat gpr now how to create the things (give your requirement)
+- create yaml file(using vim e.g. vim pathnex-sql.yaml) & copy data from chatgpt in to it..it wil be yaml file now
+you will have different files for sql(for deploy database),backend, frontend, pathnex db
+- 1st create namespace so that all operations mapped to that namespaces
+- since we created file..now do "kubectl apply -f <filename>
+- if you change anything in files you again have to hit apply
+
+our flow is pathnex --> frontend(nginx) --> Backend(httpd)--> database(mongoDB ststefulset)
+	
+- in our deployement we changed image name & metadata name as well.. so after running pods made by older metadata was still showing ..bcz we didn't delet them. 
+we deleted pods..still it was coming due to replica sets..then we deleted replica sets still it was coming due to deployement..hence we deleted deployement as well...then everything of that database deleted
+
+- Then we created PVC as while doing apply on pathnex-db it was asking for persistent volume claim
+- then all nodes/ports were up & everything was created 
+- To see which service has which port we can use "kubctl get svc -n pathnex" 
+- now its time to expose our front end using nodeport/loadbalancer/nginx
+- to hit anyport from outside/as user 1st open that port in security grp allow traffic accordingly
+- uccessfully we can see that using node:nodeport
+- we exposed with nodeport , Load balancer & nginx
+How to access nodeport? Node public ip : Nodeport(random number) but we can not expose nodeip so we use loadbalancer where we dont expose port
+once we create load balancer it will give some addess. in real enviroment we map website name (DNS) with this adres..so if any user hit that 
+website it will come to this port
+- ask chat gpt, how to register it as DNS record (for this you need to open route53. record type A : IPV4, Record type AAAA - IPV6).. here IPV4 & alias on (chat gpt)
+
+
+
+============================================================================================
+when we do terraform destroy .. only those thing will be delet which are created using terrform .. rest things we should delet manually seeing each component like data volume n all ask chat gpt.
+
+
+
+Flow of kubernetes cluster:
+AWS + Kubernetes application architecture
+Internet --> Route 53 --> Load Balancer --> Ingress --> / or .api based on that front end & backend
+-User hits https://pathnex.come from internet--> it will come to Route 53
+-route53 do DNS resolution & from route53 requets comes to load balancer (LB is public entry point to your application)
+-Then Ingress comes in to picture. It contains routing rules e.g. / : frontend & /api : backend
+-so request with / goes to frontend cluster Ip & with /api goes to backend ip (it do pathbased routing)
+-frontend is kubernetes service type of clusterIP which job is to provide a stable endpoint for front end pods. 
+The Service distributes traffic between those Pods. how pods communicate internally? using clusterIP
+- Backend ClusterIP Service: provides a stable internal endpoint for the backend Pods.
+Backend talks to MongoDB/ database. Your backend application needs to store/retrieve data.
+- MongoDB uses a Headless Service
+why headless service as database uses statefulset 
+pathnex-db-0
+pathnex-db-1
+pathnex-db-2
+These Pods have stable identities.
+Each MongoDB Pod has its own EBS volume
+
+
