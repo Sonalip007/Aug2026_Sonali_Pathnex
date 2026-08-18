@@ -1,0 +1,359 @@
+Learned below topic today in 3 hour 
+spent 2 hours in watching last month video
+1 hour : practice
+
+2 ways to deploy application NGINX Ingress & Istio
+
+Keypoint using NGINX Ingress:
+Loadbalancer : public entry point
+NGINX INGRESS : HTTP routing
+Cluster IP : Internal service communication 
+
+How to deploy kubernetes cluster 
+Liveness vs readness
+pod -- replicaset --deployement(if we kill deployement replicaset & pod will automatically delet)
+
+Whenever we try to make kuberneters cluster using terraform we do terraform apply
+update kubeconfig
+pod states
+state lock
+depends on feature :terraform apply--> start creating addon ---> depends on
+3 imp commands to check pod failures 
+deployement vs statefulset
+
+database valume wants persistance volume hence we created PVC
+
+we exposed with nodeport , Load balancer & ingress
+
+How to access nodeport? Node public ip : Nodeport(random number) but we can not expose nodeip so we use loadbalancer where we dont expose port
+once we create load balancer it will give some addess. in real enviroment we map website name (DNS) with this adres..so if any user hit that 
+website it will come to this port
+
+instead of load balancer we can use ingress
+
+IRSA
+
+2.58
+
+Flow of kubernetes cluster:
+AWS + Kubernetes application architecture
+Internet --> Route 53 --> Load Balancer --> Ingress --> / or .api based on that front end & backend
+-User hits https://pathnex.come from internet--> it will come to Route 53
+-route53 do DNS resolution & from route53 requets comes to load balancer (LB is public entry point to your application)
+-Then Ingress comes in to picture. It contains routing rules e.g. / : frontend & /api : backend
+-so request with / goes to frontend cluster Ip & with /api goes to backend ip (it do pathbased routing)
+-frontend is kubernetes service type of clusterIP which job is to provide a stable endpoint for front end pods. 
+The Service distributes traffic between those Pods. how pods communicate internally? using clusterIP
+- Backend ClusterIP Service: provides a stable internal endpoint for the backend Pods.
+Backend talks to MongoDB/ database. Your backend application needs to store/retrieve data.
+- MongoDB uses a Headless Service
+why headless service as database uses statefulset 
+pathnex-db-0
+pathnex-db-1
+pathnex-db-2
+These Pods have stable identities.
+Each MongoDB Pod has its own EBS volume
+==============================================
+
+-update Kubeconfig to know your local machine abt configuration
+-if we want to check  fail 
+k describe pod <name_of_pod> -n kubesystem
+"k events pod <name_of_pod>"
+"k logs <name_of_pod> - n kubesystem" 
+- we tried using two terrform
+"terraform apply -lock=false"
+depends on feature :terraform apply--> start creating addon ---> depends on
+
+AWS + Kubernetes application architecture
+Internet --> Route 53 --> Load Balancer --> Ingress --> / or .api based on that front end & backend
+application uses headless services as database uses statefulset (PVC)
+
+IRSA : allows a Kubernetes Pod to access AWS services securely using an IAM Role, 
+without putting AWS access keys inside the Pod. 
+
+=======================================================
+Pod lifecycle
+                     Pod Created
+                          |
+                          ↓
+                    Pending
+                          |
+                          ↓
+                   ContainerCreating
+                          |
+                          ↓
+                     Running
+                    /    |    \
+                   /     |     \
+                  ↓      ↓      ↓
+             Completed  Failed  Restart
+                |         |        |
+                ↓         ↓        |
+              Terminated  |        |
+                          ↓        |
+                       Terminated  |
+                                   |
+                                   ↓
+                              Running
+							  
+
+suppose you tell I want nginx application running
+
+Step 1 — Pod is created :
+
+The Deployment creates a ReplicaSet, and the ReplicaSet creates the Pod.
+
+you might see nginx-7d8f9c6d4b-x2abc. At this point kubernetes know "I need this pod to be run" but it hasn't necessarily decided which node
+should run it yet. so pod goes to pending statefulset
+
+Step 2- Pending :
+AT this stage if you do kubectl get pods you can see 
+NAME                     READY   STATUS    RESTARTS   AGE
+nginx-7d8f9c6d4b-x2abc   0/1     Pending   0          2s
+
+Kubernetes is figuring out:
+Which node has enough CPU?
+Which node has enough memory?
+Are there scheduling restrictions?
+Are there taints/tolerations?
+Are node selectors/affinity rules satisfied?
+Does the Pod need particular resources?
+This is mainly the Scheduler's job.
+
+Now based on above points scheduler chooses a node. Scheduler says e.g node 2 is suitable put the pod there. Pod is scheduled to Node-2.
+
+Step 3: container creating
+Kubernetes starts preparing the Pod
+Now Node-2's kubelet takes responsibility.
+Think kublet as The manager on each Kubernetes node who makes sure the Pods assigned to that node are actually running.
+Now it start preparing everything required
+Pod
+ |
+ ├── Network setup
+ ├── Volume mounting
+ ├── Image pulling
+ └── Container creation
+ 
+ During this time kubectl command shows STATUS: ContainerCreating
+ 
+ Step 4 : Running 
+ Now Container image is pulled
+ Suppose your YAML has --> image: nginx:latest
+ Now this kubelete i.e. The node needs the image.
+ So kubelet/container runtime may do:
+ 
+ Node
+ |
+ ↓
+Do I already have nginx:latest?
+ |
+ ├── Yes → use it
+ |
+ └── No
+      ↓
+   Container Registry
+      ↓
+   Download image
+
+If the image is huge or the network is slow, the Pod may stay in a waiting state for some time
+Once the image is available containers start creating . But the container isn't necessarily considered ready yet.
+
+Kubernetes may need to:
+Configure networking
+Mount volumes
+Set environment variables
+Apply security settings
+Start the container
+
+Now container start & pod moves towards Running 
+You might seee
+NAME                     READY   STATUS    RESTARTS   AGE
+nginx-7d8f9c6d4b-x2abc   1/1     Running   0          30s
+
+Ready 1/1 means 1 container existes & 1 is ready. left side says if it is ready & right side is how many container exists
+
+
+Some imp concepts : 
+Here few concept comes in to picture : 
+Probe is health check 
+1. Readiness probe : --> check if your container is ready to receive traffic
+2. Liveness probe : --> check if container is alive 
+3. Startup probe --> useful for applications that take a long time to start. without startup probe kubernetes might think This application
+isn't responding and potentially restart it before it finishes starting.
+start probe says : "Give this application time to start before judging its normal liveness."
+
+Q.What if the container crashes? : kubernetes first checks pod's restart policy 
+restartPolicy: Always in yaml.. so you might see "1" under restart
+NAME                     READY   STATUS    RESTARTS
+nginx-7d8f9c6d4b-x2abc   1/1     Running   1
+
+Q.when you see CrashLoopBackOff : Suppose your application starts and immediately crashes
+It means "Your container keeps crashing, so I'm waiting longer between restart attempts."
+
+Q.When you see ImagePullBackOff : Happens when image can't be pulled
+ 
+Q.Difference between ImagePullBackOff &CrashLoopBackOff
+ImagePullBackOff : The container couldn't even start because the image couldn't be pulled.
+CrashLoopBackOff : The container started but keeps crashing.
+
+Q. What if the Pod is deleted?  kubectl delete pod nginx-abc123
+The Pod is terminated. But if it's controlled by a Deployment The replicaset noticed that I wanted 3 Pods but I only have 2. so It creates another
+The new Pod does not have to get the old Pod's name. That's why Deployment Pods are considered replaceable/interchangeable.
+
+Q. What happen when node dies
+
+Cluster
+
+Node-1
+  ├── Pod-A
+  └── Pod-B
+
+Node-2
+  ├── Pod-C
+  └── Pod-D
+  
+Suppose Node-1 : Dies  ❌
+
+In this case Pods A and B are affected. If those Pods are created by a Deployment, Kubernetes can create replacements on another healthy node
+
+Node-2
+  ├── Pod-C
+  ├── Pod-D
+  ├── Pod-A-new
+  └── Pod-B-new
+ 
+note : Pods created by a Deployment are managed indirectly through a ReplicaSet.
+Deployment --> creates/manages ReplicaSet --> ReplicaSet --> creates/maintains Pods
+
+Q. What is SIGTERM (signal termination)
+When Kubernetes wants the container to stop, the container runtime sends a termination signal. tells application "Please shut down gracefully."
+your application termination flow will be: 
+Stop accepting new requests
+       ↓
+Finish existing requests
+       ↓
+Close database connections
+       ↓
+Save important state
+       ↓
+Exit
+
+If it doesn't terminate within the grace period, Kubernetes can force termination.
+
+Q. What happen if you delet deployement ?
+relicaset --> pod --> container everyting will be deleted 
+Deployment
+   ↓
+ReplicaSet
+   ↓
+Pods
+   ↓
+Terminated
+
+Q. Complete lifecycle:
+              You create application
+                       |
+                       ↓
+                    Pod created
+                       |
+                       ↓
+                    PENDING
+                       |
+                       | Scheduler chooses node
+                       ↓
+                 Node selected
+                       |
+                       | Kubelet prepares Pod
+                       ↓
+              Image / Network / Volume
+                       |
+                       ↓
+               Container starts
+                       |
+                       ↓
+                    RUNNING
+                       |
+                ┌──────┴──────┐
+                ↓             ↓
+          Readiness OK    Application crash
+                ↓             |
+              READY           ↓
+                |        Container restart
+                |             |
+                └──────→ RUNNING
+                              |
+                              |
+                    Pod deleted/terminated
+                              |
+                              ↓
+                         Pod removed
+                              |
+                     Deployment/ReplicaSet
+                              |
+                              ↓
+                         New Pod created
+						 
+======================================================
+
+Q. Node affinity : Giving the Scheduler rules about where you want a Pod to run.
+Normally, the Scheduler looks at available resources and other constraints
+With affinity, you can tell it: I prefer this type of node
+
+There are two types of affinity : Node affinity & Pod affinity
+
+1. Node Affinity : it says I want my Pod to run on a particular type of Node
+Suppose your nodes have labels:
+Node-1
+  disk=ssd
+
+Node-2
+  disk=hdd
+
+Node-3
+  disk=ssd
+ 
+ here you can tell kubernetes : "Put my database Pod on a node where disk=ssd."
+ 
+ affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: disk
+              operator: In
+              values:
+                - ssd
+
+Note : there are two terms : 1.requiredDuringSchedulingIgnoredDuringExecution  2. preferredDuringSchedulingIgnoredDuringExecution
+required : if No node has disk=ssd pods wont be scheduled 
+preffered : means saying "I would like this, but it's not mandatory." in this case if No node has disk=ssd pods it will schedule on other node
+
+2. Pod Affinity : it says, I want my Pod to run near another Pod
+for e.g you want to run Frontend pod near Backend pod, The Scheduler tries to place them according to the affinity rule.
+
+3. we have concept called as anti affinity : 
+Way of saying "Don't put my Pod near another Pod."
+Suppose you have 3 pods running at one node. now suppose that node dies, you will loose all pods at once.
+Anti affinity spreads pods
+
+
+QA. What is taint & toleration :
+taints are on nodes, and tolerations are on pods.
+
+e.g Let’s say you have a node with very expensive GPU hardware, and you want only special pods to run there. You add a taint on that node
+kubectl taint nodes gpu-node key=gpu:NoSchedule 
+That means: "No pod is allowed here unless it tolerates key=gpu." (toleration chya at je lihilay te tolerate hot asel tarch allowed honar)
+Toleration: gpu=true jar toleration madhey gpu=true ahe tar to allow honar
+
+Toleration = "This Pod is allowed to stay on that tainted node." (tainetd is very important here)
+If you do 
+Node-3
+Taint: gpu=true:NoSchedule  <---
+but your pod has 
+Toleration: gpu=true  <---
+Means POD can ru  there
+
+Q. 3 Taint effects
+NoSchedule  : Don't schedule new Pods here unless they tolerate the taint
+PreferNoSchedule : The Scheduler tries to avoid it, but may use it if necessary
+NoExecute : Don't schedule new Pods here, and Pods already running here may be evicted if they don't tolerate the taint.
