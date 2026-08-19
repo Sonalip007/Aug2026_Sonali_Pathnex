@@ -1,0 +1,775 @@
+3 hours : learnong helm
+1 hour : went through video once again
+2 hours : watched previous video
+
+ARGO CD (ARGO CONTINUOUS DELIVERY)
+===================================
+
+WHAT IS ARGO CD?
+----------------
+
+Argo CD (Argo Continuous Delivery) is a GitOps-based continuous delivery
+tool used to automatically deploy applications to Kubernetes.
+
+Argo CD continuously watches a Git repository and makes sure that the Kubernetes cluster matches what is defined in Git.
+
+The basic idea is:
+
+    Git = Source of Truth
+
+If you make changes in Git, Argo CD detects those changes and, when automatic synchronization is enabled, applies those changes to the
+Kubernetes cluster.
+
+
+WHY DO WE NEED ARGO CD?
+-----------------------
+
+Imagine your team stores Kubernetes YAML files in GitHub:
+
+    GitHub
+    |
+    +-- deployment.yaml
+    +-- service.yaml
+    +-- ingress.yaml
+
+
+WITHOUT ARGO CD
+----------------
+
+The deployment process may look like:
+
+    Developer changes code
+            |
+            v
+    Build Docker image
+            |
+            v
+    DevOps engineer logs into cluster
+            |
+            v
+    Runs kubectl apply
+            |
+            v
+    Application gets deployed
+
+
+Problems with this approach:
+
+    - Manual work
+    - Human errors
+    - No automatic synchronization
+    - Difficult to track deployment changes
+    - Users may need direct Kubernetes access
+
+
+WITH ARGO CD
+------------
+
+With Argo CD, the deployment can happen automatically:
+
+    Developer updates Git
+            |
+            v
+    Git Repository
+            |
+            v
+    Argo CD detects change
+            |
+            v
+    Argo CD synchronizes
+            |
+            v
+    Kubernetes cluster updated
+
+
+WHAT IS GITOPS?
+---------------
+
+Argo CD follows the GitOps approach.
+
+The main principle of GitOps is:
+
+    Git is the Single Source of Truth.
+
+Git contains the desired state of the Kubernetes cluster.
+
+Argo CD continuously compares:
+
+    Desired State                Current State
+         |                            |
+         v                            v
+        Git                       Kubernetes
+
+
+Example:
+
+Git says:
+
+    replicas: 3
+
+Kubernetes currently has:
+
+    replicas: 3
+
+Therefore:
+
+    Git = Kubernetes
+    Status = Synced
+
+
+WHAT HAPPENS IF SOMEONE CHANGES KUBERNETES DIRECTLY?
+------------------------------------------------------
+
+Suppose Git says:
+
+    replicas: 3
+
+Someone manually changes Kubernetes:
+
+    kubectl scale deployment myapp --replicas=5
+
+Now:
+
+    Git              Kubernetes
+     3        !=          5
+
+The desired state and current state are different.
+
+Argo CD does NOT change Git to 5.
+
+Git remains:
+
+    replicas: 3
+
+because Git is the source of truth.
+
+
+IF SELF-HEALING IS ENABLED
+--------------------------
+
+If selfHeal is enabled:
+
+    Git = 3
+    Kubernetes = 5
+
+Argo CD detects the difference and changes Kubernetes back to 3.
+
+Result:
+
+    Git = 3
+    Kubernetes = 3
+
+
+IF SELF-HEALING IS DISABLED
+---------------------------
+
+If selfHeal is disabled:
+
+    Git = 3
+    Kubernetes = 5
+
+Argo CD detects the difference.
+
+The application becomes:
+
+    OutOfSync
+
+But Argo CD does not automatically change Kubernetes.
+
+Result:
+
+    Git = 3
+    Kubernetes = 5
+    Status = OutOfSync
+
+Someone must manually synchronize the application.
+
+
+WHY DOESN'T ARGO CD UPDATE GIT?
+-------------------------------
+
+Because of the GitOps principle:
+
+    Git defines the desired state.
+    Kubernetes must follow Git.
+
+Argo CD should not change Git just because someone manually changed
+the Kubernetes cluster.
+
+Otherwise, Git would no longer be the reliable source of truth.
+
+
+CORE COMPONENTS OF ARGO CD
+---------------------------
+
+1. GIT REPOSITORY
+-----------------
+
+The Git repository contains Kubernetes configuration such as:
+
+    - YAML files
+    - Helm charts
+    - Kustomize files
+    - Kubernetes manifests
+
+Example:
+
+    Git Repository
+    |
+    +-- deployment.yaml
+    +-- service.yaml
+    +-- ingress.yaml
+    +-- configmap.yaml
+
+
+2. ARGO CD SERVER
+-----------------
+
+Argo CD Server provides:
+
+    - Web UI
+    - API
+    - Authentication
+    - User access
+
+Through the Argo CD UI, users can see:
+
+    - Application status
+    - Sync status
+    - Health status
+    - Kubernetes resources
+    - Deployment history
+
+
+3. REPOSITORY SERVER
+--------------------
+
+Repository Server connects to Git repositories.
+
+It reads and processes:
+
+    - YAML files
+    - Helm charts
+    - Kustomize files
+
+Its job is to determine what Kubernetes resources should exist based
+on the Git configuration.
+
+
+4. APPLICATION CONTROLLER
+--------------------------
+
+The Application Controller is one of the most important Argo CD
+components.
+
+It continuously compares:
+
+    Desired State
+          |
+          v
+         Git
+
+          VS
+
+    Current State
+          |
+          v
+      Kubernetes
+
+If there is a difference, Argo CD detects the application as
+OutOfSync.
+
+Depending on the sync configuration, Argo CD can automatically
+synchronize the cluster.
+
+
+ARGO CD ARCHITECTURE
+--------------------
+
+A simplified architecture:
+
+    Git Repository
+          |
+          v
+    Repository Server
+          |
+          v
+      Argo CD Server
+          |
+          v
+    Application Controller
+          |
+          v
+    Kubernetes Cluster
+
+
+WHAT IS AN APPLICATION IN ARGO CD?
+-----------------------------------
+
+An Argo CD Application is a Kubernetes custom resource that tells
+Argo CD:
+
+    - Which Git repository to use
+    - Which branch/tag/commit to use
+    - Which folder/path contains the manifests
+    - Which Kubernetes cluster to deploy to
+    - Which namespace to deploy into
+
+Example:
+
+    apiVersion: argoproj.io/v1alpha1
+    kind: Application
+    metadata:
+      name: myapp
+    spec:
+      source:
+        repoURL: https://github.com/example/myapp.git
+        path: kubernetes
+        targetRevision: main
+
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: production
+
+In simple terms:
+
+    Argo CD Application means:
+
+    "Deploy this application's configuration from this Git location
+     to this Kubernetes cluster and namespace."
+
+
+APPLICATION LIFECYCLE
+---------------------
+
+The typical flow is:
+
+    1. Developer changes configuration
+              |
+              v
+    2. git push
+              |
+              v
+    3. Git repository is updated
+              |
+              v
+    4. Argo CD detects the change
+              |
+              v
+    5. Argo CD compares Git vs Kubernetes
+              |
+              v
+    6. Difference is detected
+              |
+              v
+    7. Application becomes OutOfSync
+              |
+              v
+    8. Synchronization happens
+              |
+              v
+    9. Kubernetes is updated
+
+
+SYNC STATUS
+-----------
+
+1. SYNCED
+
+    Git = Kubernetes
+
+The Kubernetes cluster matches the configuration stored in Git.
+
+
+2. OUTOFSYNC
+
+    Git != Kubernetes
+
+The Kubernetes cluster is different from what Git specifies.
+
+
+Example:
+
+    Git:
+        replicas = 3
+
+    Kubernetes:
+        replicas = 5
+
+    Status:
+        OutOfSync
+
+
+SYNC MODES
+----------
+
+1. MANUAL SYNC
+--------------
+
+Argo CD detects the difference, but a user manually triggers the
+synchronization.
+
+For example:
+
+    argocd app sync myapp
+
+Or the user can click the Sync button from the Argo CD UI.
+
+
+2. AUTOMATIC SYNC
+-----------------
+
+Argo CD automatically synchronizes changes from Git.
+
+Example:
+
+    syncPolicy:
+      automated: {}
+
+
+The flow becomes:
+
+    Git changed
+        |
+        v
+    Argo CD detects change
+        |
+        v
+    Argo CD automatically syncs
+        |
+        v
+    Kubernetes updated
+
+
+SELF-HEALING
+------------
+
+Self-healing is an important Argo CD feature.
+
+Suppose Git says:
+
+    replicas: 3
+
+Someone manually changes Kubernetes:
+
+    replicas: 5
+
+If self-healing is enabled:
+
+    syncPolicy:
+      automated:
+        selfHeal: true
+
+Argo CD detects:
+
+    Desired State = 3
+    Current State = 5
+
+Argo CD changes Kubernetes back to:
+
+    replicas: 3
+
+Therefore:
+
+    Git = 3
+    Kubernetes = 3
+
+
+WITHOUT SELF-HEALING
+--------------------
+
+If:
+
+    syncPolicy:
+      automated:
+        selfHeal: false
+
+Then:
+
+    Git = 3
+    Kubernetes = 5
+
+Argo CD marks the application:
+
+    OutOfSync
+
+But it does not automatically correct the manual change.
+
+
+PRUNING
+-------
+
+Pruning means removing Kubernetes resources that are no longer
+defined in Git.
+
+
+Example:
+
+Initially Git contains:
+
+    deployment.yaml
+    service.yaml
+    ingress.yaml
+
+Kubernetes contains:
+
+    Deployment
+    Service
+    Ingress
+
+
+Later, the developer deletes ingress.yaml from Git.
+
+Without pruning:
+
+    Git:
+        Deployment
+        Service
+
+    Kubernetes:
+        Deployment
+        Service
+        Ingress
+
+The Ingress may remain in Kubernetes.
+
+
+With pruning enabled:
+
+    syncPolicy:
+      automated:
+        prune: true
+
+Argo CD detects that the Ingress is no longer defined in Git and
+removes it from Kubernetes.
+
+
+MULTI-CLUSTER DEPLOYMENT
+------------------------
+
+Argo CD can manage multiple Kubernetes clusters from a central
+Argo CD installation.
+
+Example:
+
+                       ARGO CD
+                          |
+              +-----------+-----------+
+              |           |           |
+              v           v           v
+          Cluster 1   Cluster 2   Cluster 3
+             Dev         Test       Production
+
+
+ROLLBACK
+--------
+
+Argo CD keeps application/deployment history.
+
+If a new version causes problems, you can roll back to an earlier
+version using the Argo CD UI or CLI.
+
+Example:
+
+    Version 1
+        |
+        v
+    Version 2
+        |
+        v
+    Version 3
+        |
+        v
+      Problem
+        |
+        v
+     Rollback
+        |
+        v
+    Version 2
+
+
+In a GitOps workflow, the preferred long-term approach is generally
+to revert the Git change so that Git again represents the desired
+state.
+
+
+AUDIT TRAIL
+-----------
+
+Git provides a strong audit trail.
+
+You can see:
+
+    - Who made the change
+    - When the change was made
+    - What was changed
+    - Which commit introduced the change
+
+Example:
+
+    Commit: abc123
+    Author: Developer
+    Change: replicas 3 -> 5
+
+
+SECURITY
+--------
+
+With GitOps, developers do not necessarily need direct access to
+the Kubernetes cluster.
+
+Instead:
+
+    Developer
+        |
+        v
+       Git
+        |
+        v
+     Argo CD
+        |
+        v
+    Kubernetes
+
+This can reduce the need for users to have direct kubectl access
+to production.
+
+
+IMPORTANT CONCEPT
+-----------------
+
+Remember this:
+
+                    GIT
+               Desired State
+                    |
+                    v
+                 ARGO CD
+                    |
+             Continuously compares
+                    |
+                    v
+              KUBERNETES
+              Current State
+
+
+ARGO CD'S MAIN JOB
+------------------
+
+The main job of Argo CD is:
+
+    "Make the Kubernetes cluster match the desired state
+     defined in Git."
+
+
+IMPORTANT TERMS TO REMEMBER
+----------------------------
+
+Git
+    Source of truth / Desired state
+
+Kubernetes
+    Current state
+
+Argo CD
+    Continuously compares desired state with current state
+
+Synced
+    Git and Kubernetes match
+
+OutOfSync
+    Git and Kubernetes are different
+
+Auto Sync
+    Automatically applies Git changes
+
+Self Heal
+    Automatically corrects manual changes made directly
+    in the Kubernetes cluster
+
+Prune
+    Removes resources that are deleted from Git
+
+Application
+    Defines what to deploy, where to get it from, and where
+    to deploy it
+
+Repository Server
+    Reads and processes the Git repository
+
+Application Controller
+    Compares Git desired state with Kubernetes current state
+
+Argo CD Server
+    Provides UI, API and authentication
+
+
+FINAL EXAMPLE
+-------------
+
+Suppose Git says:
+
+    replicas: 3
+
+
+CASE 1: Developer changes Git from 3 to 5
+
+    Git = 5
+    Kubernetes = 3
+
+            |
+            v
+
+       Argo CD detects change
+
+            |
+            v
+
+       Kubernetes = 5
+
+
+CASE 2: User manually changes Kubernetes from 5 to 2
+
+    Git = 5
+    Kubernetes = 2
+
+            |
+            v
+
+    Argo CD detects difference
+
+
+If selfHeal = true:
+
+    Kubernetes -> 5
+
+
+If selfHeal = false:
+
+    Kubernetes stays at 2
+    Application = OutOfSync
+
+
+CASE 3: Developer deletes Deployment from Git
+
+    Git:
+        Deployment does not exist
+
+    Kubernetes:
+        Deployment exists
+
+If prune = true:
+
+    Argo CD removes Deployment from Kubernetes.
+
+
+KEY IDEA
+--------
+
+Git defines WHAT SHOULD EXIST.
+
+Kubernetes represents WHAT CURRENTLY EXISTS.
+
+Argo CD continuously compares the two and keeps Kubernetes aligned
+with Git according to the configured synchronization policy.
