@@ -1,0 +1,97 @@
+3 hours : learnong helm
+1 hour : went through video once again
+2 hours : watched previous video
+
+Terraform is open source tool that allows you to define,manage infrastructure
+It uses HCl language (Harshicorp configuration language)
+User can automate infrastructure using terraform
+Terraform supports multiple cloud providers and manages infrastructure through providers and a state file.
+
+Terraform vs traditional/manual infrastructure
+AWS Console
+   ↓
+Create VPC
+   ↓
+Create Subnet
+   ↓
+Create EC2
+   ↓
+Configure networking
+
+******
+Terraform Code
+      ↓
+terraform plan
+      ↓
+terraform apply
+      ↓
+Cloud Infrastructure
+
+Key concepts of terraform :
+provider : it is  platform where Terraform is going to create things
+Resource : actual thing you want to create VPC,S3,Subnet,LB etc
+Module : A reusable package/blueprint/ file config
+state : terraforms notebook
+
+why to use terraform 
+1. Declarative syntax : you can define what infrastructure you need 
+2. Infrastructure as code : managing infrastructure using code. It allows you to version control your infrastructure 
+3. Platform Agnostic : Supports major cloud platform Like AWS,Azzure & GCP
+4. Reusable , Automatable , Repeatable
+
+terraform commands:
+- terraform init : initialize project & downloads modules
+- terraform fmt : formate file in to standard style (formating)
+- terraform validate:Validates the configuration files for syntax errors
+- plan: reads your config file & compare it with current state. It shows what changes it will make
+- terraform apply: this command actual make chnages in infrastructure
+- terraform destroy:If you want to tear down everything that Terraform created
+
+terraform state file: 
+terraform uses state file which is like record or track of all activities
+Terraform maintains a state file (terraform.tfstate) to keep track of the resources it manages.
+Terraform uses this state to detect changes between the actual infrastructure and your configuration.
+
+Imp commands from state file 
+- terraform state list: Lists all resources in the state file. (suppose we make frontend,backend,PVC so it will sho just list (header name)
+- terraform state show <resource>: Shows the detailed state of a specific resource. - shows detail info abt specific resource
+like everything about front end/backend/PVC
+
+where we keep state file?
+aws s3 in case of amazon, gcs(google cloud storage) -google, blob storage- Azzure
+- State file is written in json language
+
+what is terraform workspace
+terragrant
+
+======================= In short ============================
+open source tool allows you to define & manage infrastructure. HCL language
+without terraform : AWS console - create VPC - creaet subnet - EC2 - configure networking
+with terra plan & apply
+
+why to use terraform 
+1. Declarative syntax : you can define what infrastructure you need 
+2. Infrastructure as code : managing infrastructure using code 
+3. Platform Independant : Supports major cloud platform Like AWS,Azzure & GCP
+4. Reusable , Automatable , Repeatable
+
+terraform commands:
+- terraform init : initialize project & downloads modules
+- terraform fmt : will do file formating
+- terraform validate: validate syntax errors
+- plan: reads your config file & compare it with current state. It shows what changes it will make
+- terraform apply: make actual chnages in infrastructure
+- terraform destroy:If you want to tear down everything that Terraform created
+
+Key concepts of terraform :
+provider : it is  platform where Terraform is going to create things
+Resource : actual thing you want to create VPC,S3,Subnet,LB etc
+Module : A reusable package/blueprint/ file config
+state : terraforms notebook
+
+terraform state file: record or track of all activities
+detect changes between the actual infrastructure and your configuration using st file
+
+aws s3 in case of amazon, gcs -google, blob storage- Azzure
+
+statelock

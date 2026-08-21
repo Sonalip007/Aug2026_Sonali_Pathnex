@@ -1,0 +1,162 @@
+ 3 hours : learnong helm
+1 hour : went through video once again
+2 hours : watched previous video
+
+Installed prometheus using helm chart : think of Prometheus as a monitoring system for your cluster.
+Prometheus collects metrics (numbers about what's happening) from your Kubernetes cluster and applications.
+Prometheus collects these numbers and stores them as time-series data
+
+Helm is the package manager for Kubernetes.
+Instead of manually creating dozens of Kubernetes YAML files, you can install a package called a Helm chart
+helm install prometheus prometheus-community/prometheus
+which means : "Helm, install the Prometheus Kubernetes package into my cluster."
+
+The Prometheus Helm chart creates the Kubernetes resources needed to run Prometheus
+Prometheus = collects/stores metrics
+
+Grafana = visualizes those metrics
+
+Helm = installs/manages the Kubernetes packages
+
+===============================================================
+Helm is a tool used to manage Kubernetes applications.  Helm 4 is now the current major release
+It simplifies process of deploying, configuring & maintaing complex applications on kubernetes cluster
+It is like package manager for kubernetes like we have pip for python 
+
+
+Q.What problem  helm solves?
+without helm you might create multiple yaml files 
+deployment.yaml
+service.yaml
+configmap.yaml
+secret.yaml
+ingress.yaml
+serviceaccount.yaml
+hpa.yaml
+
+Then you run commands below for each file... as shown below
+
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+kubectl apply -f configmap.yaml
+...
+
+This is ok for one application.
+
+But imagin a real application with frontend, backend, Database, Monitoring, secrets, Ingress etc.You might have dozens or hundreds of YAML files
+Then you deploy 
+
+imagine doing this for 50 applications, across:
+
+development
+testing
+staging
+production
+
+It gets messy 
+Instead of manually managing 10–20 Kubernetes YAML files, Helm lets you package them together and install them as one application.
+
+Think about installing an application on your laptop.Suppose you want to install Microsoft Word,You don't manually install all files
+
+In simple analogy suppose you want to prepare shahi panner, you need to arrange paneer, onion,tomato,salt, masala, kaju,etc by your own
+instead you bring ready to eat shahi paneer masala pouch.. helm is like this here
+
+
+Helm chart has all yaml files : Deployment, services, ingress, secrets, pvc etc. it will look like :
+my-app/
+├── Chart.yaml
+├── values.yaml
+├── templates/
+│   ├── deployment.yaml
+│   ├── service.yaml
+│   ├── configmap.yaml
+│   └── ingress.yaml
+└── charts/
+
+we can create chart with command : helm create my-app
+
+Will see chart & values one by one 
+
+1. Chart yaml
+In this Chart.yaml describes the chart itself.
+
+apiVersion: v2   <-- Indicates API version
+name: my-app     <-- chart name 
+description: My Kubernetes application  <-- Human readable description 
+type: application
+version: 1.0.0   <-- Chart Version
+appVersion: "2.5.0" <-- App Version
+
+apiVersion: v2 This means you're using Helm chart API version 2
+
+2. values.yaml
+This is where Helm becomes really powerful. Suppose your Deployment contains 3 replicas but in development you want 1 replica & production 5 replicas
+then Instead of hardcoding:replicas: 3  you put: replicaCount: 3. inside values.yaml --> replicas: {{ .Values.replicaCount }}
+
+Now suppose I have the same application.In development I want:1 copy in production i want 10 copies. 
+Do I want to create two completely different applications?  -- No
+I want one application, but with different settings. thats where values.yaml helps 
+
+Think of it as a settings file.
+values.yaml
+number of copies = 10
+app version = 1.5
+CPU = 500
+memory = 1GB
+you will just write how many values you want. I want 10 copies of my application running
+
+in simple words: 
+chart.yaml has version . it has chart versions 
+Value. yaml has data of values available for that version .. mhanje chart.yaml madhey aslelya version chya veli mazi value kay hoti
+kiti replica set hote kiti memory hoti he sagla values.yaml madhey asta. It has application values
+
+3. Template : 
+Suppose your Kubernetes YAML says replicas: 10 But we don't want to hardcode 10. we want it should be based on user provided number 
+In this case helm let us write --> replicas: {{ .Values.replicaCount }}
+
+4. release : When we install a chart, the installed instance is called a Release.
+suppose I have helm chart named my-app, so release is actual output created from my-app
+
+helpers.tpl:
+-It's a helper file where we define reusable template logic so that we don't repeat the same code across Deployment, 
+Service, Ingress, and other templates."
+
+helm.ignore :files which we don't want helm to track will come under this
+
+How vrsion of application define : 1.35.3
+1 -> major version - big change that break compatibility   - major change
+35 -> Minor version - new features that generally backward compatible - new feature 
+3 -> Patch version - bug fixes & small improvements - bug fixing
+
+
+=========================== In short ============================
+limit & request : cpu & ram pe lagta hai ye. resource quota (limit >= req)
+Helm used to manage kubernetes application. It is like package manager for kubernetes
+Simplifies process of deploying, configuring & maintaining complex applications on kubernetes cluster
+frontend, backend, database ingress
+Helm packages all those Kubernetes YAML files into one reusable package.
+
+Why we use helm :
+Simplifies deployment
+version control : rollback
+configuration management 
+Reusable & shareable
+
+Helm Client : coomand line tool to interact to manage charts
+helm : kubernetes package manager
+Helm repo : location where helm charts are placed
+chart : blueprint for application. instructions needed to deploy an application
+chart.yaml : Information about chart
+values.yaml : default configuration. you can give number of copies of that application you want
+Template : no hardcore values: replicas: {{ .Values.replicaCount }} passing paranthesis
+release : suppose I have helm chart named my-app, so release is actual output created from my-app
+
+-helpers.tpl:
+-It's a helper file where we define reusable template logic so that we don't repeat the same code across Deployment
+
+helm.ignore :files which we don't want helm to track will come under this
+
+helm list : show us all the releases we have deployed to our Kubernetes cluster
+helm upgrade my-nginx-ingress stable/nginx-ingress : To upgrading helm release
+helm rollback my-nginx-ingress 2 : Rolling Back a Release 
+helm uninstall my-nginx-ingress : Uninstalling a Release
