@@ -1,0 +1,305 @@
+3 hours : learnong helm
+1 hour : went through video once again
+2 hours : watched previous video
+
+Imagine you are a company administrator and you have 100 computers/servers.
+
+You need to do the same thing on all of them:
+
+Install Nginx
+Create a user
+Copy a configuration file
+Start Nginx
+Make sure Nginx starts automatically after reboot
+
+Without Ansible, you might SSH into every server:
+Server 1 → SSH → install nginx → configure → start
+Server 2 → SSH → install nginx → configure → start
+Server 3 → SSH → install nginx → configure → start
+...
+Server 100 → SSH → install nginx → configure → start
+
+😫 Very repetitive.
+
+With Ansible, you write the instructions once:
+
+"Install Nginx,
+copy this configuration,
+start Nginx,
+and make sure it is running."
+
+                 ↓
+              Ansible
+        ↙       ↓       ↘
+    Server 1  Server 2  Server 3
+	
+Basically it is an automation and configuration-management tool.
+Ansible allows us to automate repetitive tasks on multiple machines. such as installing software, configuring servers, and
+managing systems across a large number of machines
+
+Ansible architecture
+- There are usually two important concepts: Control Node : The machine from which you run Ansible.
+- Managed Nodes : The servers that Ansible manages.
+
+Your laptop could be the control node. The AWS EC2 instances could be the managed nodes.
+
+Q.Does Ansible install an agent on every server?
+No, It is agentless.
+You don't generally install an Ansible agent on every Linux server.
+For Linux, Ansible commonly connects using SSH. WinRM for windows system
+
+Q. The four important things in Ansible
+
+Inventory : Ansible should know Which servers should I manage?  That information is stored in an inventory.
+Playbook : Now Ansible knows which servers to manage. But it needs to know: "What should I do?". Playbook help here. It is YAML File
+Tasks : A task is one specific job. Install nginx is one task , start nginx
+Modules : Ansible provides many modules that perform specific types of work.
+
+Playbooks: where you define the tasks you want Ansible to execute -YAML
+Inventory: list of servers (or "hosts") that Ansible manages.
+Modules: used to carry out tasks on the managed systems, such as installing software, creating files
+Roles: role is a way of organizing playbooks into reusable units.
+
+e.g -  Suppose you want to install Nginx on Ubuntu. here apt module has below thing. This module Make sure it exists
+name: Install nginx
+  apt:
+    name: nginx
+    state: present
+
+example of service module , which says make sure that nginx service is started & running
+- name: Start nginx
+  service:
+    name: nginx
+    state: started
+	
+Q. Why groups are useful
+Suppose you have 10 web servers, 3 database servers, 2 monitoring servers
+You can organoze them :
+[webservers]
+web1
+web2
+web3
+...
+web10
+
+[dbservers]
+db1
+db2
+db3
+
+[monitoring]
+monitor1
+monitor2
+
+Then you can tell Ansible: "Install Nginx only on webservers."   or: "Install PostgreSQL only on dbservers." which is Very convenient.
+
+====
+Flow how it works:
+You run :  ansible-playbook -i inventory nginx.yml
+
+ANsible reads inventary which has 
+webservers:
+  10.0.1.10
+  10.0.2.10
+  
+Then reads playbook:
+Install nginx
+Start nginx
+
+what it will do?
+
+              Ansible
+                 |
+        +--------+--------+
+        |                 |
+       SSH               SSH
+        |                 |
+        ↓                 ↓
+    EC2-1              EC2-2
+        |                 |
+    Install             Install
+     Nginx               Nginx
+        |                 |
+     Start              Start
+     Nginx              Nginx
+	 
+
+Q.Ansible vs Terraform ?
+Terraform is mainly used to create infrastructure.
+Create VPC
+Create subnet
+Create EC2
+Create Load Balancer
+Create EKS
+Create IAM role
+Think : Terraform builds the house.
+
+Ansible is mainly used to configure/manage what's inside or on those machines.
+Install Nginx
+Install Java
+Create users
+Copy configuration
+Start application
+Deploy application
+Think : Ansible sets up the house after it is built.
+
+i.e.
+Terraform
+   ↓
+Infrastructure
+   ↓
+EC2
+   ↓
+Ansible
+   ↓
+Configuration
+   ↓
+Application
+
+
+Q. Ansible vs Docker vs Kubernetes ?
+Docker : Packages an application. Application + Dependencies = Docker Image
+Ansible: Automates configuration/deployment tasks.
+Kubernetes : Manages containerized workloads.
+
+4 Tools together 
+Terraform
+    ↓
+Creates AWS infrastructure
+    ↓
+EC2 / EKS
+    ↓
+Ansible
+    ↓
+Configures machines
+    ↓
+Docker
+    ↓
+Packages applications
+    ↓
+Kubernetes
+    ↓
+Runs and manages containers
+
+Q. Ansible vs Helm
+Ansible manages/configures machines and automates tasks.
+Helm manages/packages Kubernetes applications.
+
+=========================
+Suppose you have 2 web servers 
+1. Inventary 
+Server 1 → 10.0.1.10
+Server 2 → 10.0.1.20
+you will put this data in inventary . it will tell ansible  "These are the servers you need to work on
+[webservers]
+web1 ansible_host=10.0.1.10
+web2 ansible_host=10.0.1.20
+
+2. Then we create Role. To organize everything 
+Imagine you are moving into a new house. you have big list
+Set up my bedroom
+Set up my kitchen
+Set up my bathroom
+
+Instead of keeping everything in one huge list, you organize it.
+HOUSE SETUP
+│
+├── Bedroom setup
+│   ├── Buy bed
+│   ├── Install cupboard
+│   └── Install lights
+│
+├── Kitchen setup
+│   ├── Install stove
+│   ├── Install sink
+│   └── Install refrigerator
+│
+└── Bathroom setup
+    ├── Install shower
+    └── Install mirror
+
+Bedroom setup, Kitchen setup, Bathroom setup are like Roles.
+
+Now coming to ansible, Suppose your company has 100 servers.You want to configure Nginx, Docker, Java, Users, Security
+You could put everything into one playbook: It might become 2,000 lines.
+Instead, you organize it:
+roles/
+│
+├── nginx/
+│
+├── docker/
+│
+├── java/
+│
+├── monitoring/
+│
+└── security/
+A reusable folder containing everything needed to perform one particular type of configuration.
+
+Let's take ONLY Nginx
+roles/
+└── nginx/ 
+Inside it
+roles/
+└── nginx/
+    │
+    ├── tasks/
+    ├── handlers/
+    ├── templates/
+    ├── files/
+    ├── vars/
+    └── defaults/
+
+Inside role-->nginx-->task
+
+3.Suppose we want to install Nginx. Inside the Role → Tasks -->Module
+roles/nginx/tasks/main.yml
+---
+- name: Install nginx
+  ansible.builtin.apt:   <-- Module
+    name: nginx
+    state: present
+
+- name: Start nginx
+  ansible.builtin.service: <-- Another Module
+    name: nginx
+    state: started
+
+- name: Install nginx <-- This is task (install nginx)
+
+4. Module : Task uses Module 
+In above examples we have 2 modules 
+1. apt: - thats 1st module
+2. service - Thats 2nd module
+
+different states in module :
+
+| State       | Meaning                                      | Example           |
+| ----------- | -------------------------------------------- | ----------------- |
+| `present`   | Make sure something exists/is installed      | Install a package |
+| `absent`    | Make sure something doesn't exist/is removed | Remove a package  |
+| `started`   | Make sure a service is running               | Start nginx       |
+| `stopped`   | Make sure a service is stopped               | Stop nginx        |
+| `restarted` | Restart a service                            | Restart nginx     |
+| `reloaded`  | Reload service configuration                 | Reload nginx      |
+| `latest`    | Make sure the latest version is installed    | Update package    |
+
+
+overall picture :
+
+ROLE: nginx
+│
+└── tasks
+      │
+      └── main.yml
+             │
+             ├── TASK 1: Install nginx
+             │       │
+             │       └── apt MODULE
+			 │             ansible.builtin.apt:   <-- Module
+             │             name: nginx
+             │             state: present
+             │
+             └── TASK 2: Start nginx
+                     │
+                     └── service MODULE
