@@ -1,0 +1,99 @@
+3 hours : learnong helm
+1 hour : went through video once again
+2 hours : watched previous video
+
+Q. What is terrform state & where it stored - terraform.tf
+- It is brain of terraform. It is like book. every time we do terraform.apply this file records it
+- The file is in the form of JSON 
+- It stores mapping between your terraform configuration & real infrastructure 
+- It tracks resource attributes, dependencies & metadata
+1.Resource attributes = details about resource
+Suppose Terraform creates an EC2 instance.
+Terraform needs to remember information such as
+EC2 Instance
+├── Instance ID: i-123456
+├── Instance type: t3.micro
+├── AMI: ami-12345
+├── Private IP: 10.0.1.10
+└── Availability Zone: ap-south-1a
+
+2.Dependencies = Which resource depends on which (depends-on_
+VPC
+ ↓
+Subnet
+ ↓
+EC2
+The EC2 needs the subnet. The subnet needs the VPC terraform keep track of this dependencies.
+& it will follow reverse sequence while destroying 
+
+3. Metadata : Information Terraform uses to identify/manage resources
+Metadata basically means information about the resource that Terraform needs to manage it.
+Terraform resource:
+aws_instance.web
+
+AWS resource:
+i-123456789
+Terraform needs to know: "aws_instance.web in my Terraform code corresponds to i-123456789 in AWS
+That kind of information is part of what Terraform maintains in its state.
+
+============================
+
+Q. State Lock :
+It avoids two user from currupting the state 
+when two users downloaded terraform files from git & started working on same project. The state file is in cloud
+in this case if they both run terraform apply almost at the same time.  so in this case both terraform processes may try to change the same state 
+at the same time . That causes conflict 
+state locking is another way  to saying only one person can modify the state at a time.
+- Think it as of shared notebook
+
+Terraform State
+      ↓
+   🔒 LOCKED
+      ↓
+Developer A is using it. In this case if Developer B tries:terraform apply, Terraform says, essentially:"somebody is currently modifying state.Wait."
+
+see following message as an example.
+Error: Error acquiring the state lock
+
+Error message: state lock is already held
+
+Lock Info:
+  ID:        12345678-abcd-....
+  Path:      my-terraform-state/terraform.tfstate
+  Operation: OperationTypeApply
+  Who:       developer-a@company.com
+  Version:   1.x.x
+  Created:   2026-08-21 12:30:45.123456 +0000 UTC
+  
+after Developer A finishes, Terraform state --> unlock .  it releases lock automatically 
+But suppose after terraform lock laptop crashes & it is remain in the locked state then you have to unlock it
+
+Now Developer B can then run terraform, but How does Developer B get the latest state?
+
+===========================
+
+Q.ways to disable state lock :
+- -lock-false
+- terraform force-unlock LOCK_ID  <- force unlocking
+
+Suppose Developer A finishes:
+Developer A
+     ↓
+terraform apply
+     ↓
+Remote State updated
+
+Developer B later runs: terraform plan
+Terraform retrieves the current remote state.
+So B doesn't need to ask:"Hey A, can you send me your terraform.tfstate?"  The remote backend handles it.
+
+=============================
+Q. What are different ways to recover state file if it deleted by mistakley, or lost or corrupted
+- Since we store state file in s3 bucket, If we enable S3 versioning then 
+if we delete by mistakley, it will generate delete marker for that. so by deleting delete marker we can restore/recover 
+- Taking backup ..do terraform state pull 
+
+How to manage state drift?
+Drift = actual infrastructure != state
+Use terraform plan to detect drift --> terraform apply to fix drift by applying desired state
+or terraform refresh

@@ -1,0 +1,32 @@
+3 hours : learnong helm
+1 hour : went through video once again
+2 hours : watched previous video
+
+CI- Continuous Integration CD - Delivery (Human intervention required)/Deployment(Human Intervention not required)
+A pipeline is simply a sequence of automated steps.
+Delivery = ready to deploy
+Deployment = actual deployment 
+
+Main benifits of using CI/CD
+- Automation : less manual work
+- Faster Delivery : Code can reach users faster.
+- Early bug detection: Tests run automatically & find bug if any at initial stage 
+- Consistency : Every deployment follows the same steps
+- Reduced human errors : You don't have to manually type 20 commands every time.
+- Easy rollback : Depending on the deployment setup, you can return to a previous application version.
+
+Jenkins is a open-source automation server used to automate CI/CD tasks. (jenkin, Git Lab, Git actions, Bamboo etc)
+It intergartes with Version control systems like GitHub, BitBucket & allows automated testing & deployment
+Uses declarative - Using(Groovy) /Scripted Pipeline (programming flexibility) . Works on 8080 port
+It might have master slave setup where Jenkin controller is manager who assigs task to jenkin agents -do actual task
+- Plugins : give Jenkins additional capabilities to integrate with multiple tools 
+- Stages: Each stage runs sequentially 	 parallel execution is defined
+
+Pipeline execution : Trigger, stages, Post Action 
+
+Components :
+Pipeline: sequence of tasks jenkins need to follows it triggers with Git Commit, Schedule time, manual trigger
+Jenkinsfile: contains the instructions for the Jenkins pipeline.
+Jobs: Tasks within a pipeline
+Nodes and Executors: Node: Where Jenkin Runs. Executers: processes runs on this nodes
+Freestyle Projects: A simpler configuration for jobs but less flexible than Pipelines.

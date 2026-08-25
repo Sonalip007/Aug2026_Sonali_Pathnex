@@ -1,0 +1,33 @@
+3 hours : learned Datadog
+1 hour : went through video once again
+2 hours : watched previous video
+
+Prometheus = collects and stores metrics
+Grafana = displays those metrics in beautiful dashboards
+
+why need of monitoring tool:
+Suppose you are having EKS cluster with Front end, back end service everything is working fine.. but suddenly user complain
+then evrytime you can not do Kubectl get pod, kubectl describe pod & check event that too after every minute
+if you have multiple cluster then it will be hard to manage.. in this case prometheus & Grafana helps
+
+3 pillers of observability
+Metric: numeric information : CPU,memory,disk usage,NW traffic, Number of errors, no of req
+Logs : Detailed records of what happened. can check failures here
+Traces : Show the journey of one request through your application.
+If the request takes 5 seconds, a trace can help you discover which part consumed those 5 seconds.
+
+Prometheus is a monitoring and metrics collection system. 
+- Collect numerical information about your systems and applications  and store it as time-series data.
+- How does Prometheus get the information? Prometheus commonly uses a pull model. periodically reads the metrics endpoint.
+- Can set up alert by puting threshold 
+
+now Prometheus has collected thousands of metrics. but the data isn't always easy to understand visually.
+Grafana is a visualization and dashboarding platform.
+
+Tool	      Default Port	Protocol	Written in	                     Query language
+Prometheus	   9090	         HTTP	     Go (Golang)	               PromQL
+Grafana	       3000	         HTTP	     Go + TypeScript/JavaScript	   Depends on data source; with Prometheus → PromQL
+
+Grafana--> connections-->Data Sources-->All data source--> Prometheus (URL)
+
+alert manager : alert if threshold crosses . via email, message
