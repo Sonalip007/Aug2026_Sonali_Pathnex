@@ -1,0 +1,23 @@
+3 hours : learned Kafka
+1 hour : went through video once again
+2 hours : Practical
+
+kafka is like middle man that receives message/events & allows multiple applications to read those messsages
+Kafka is particularly useful when you have large amounts of events/messages flowing between systems.
+
+- Producer : A Producer is the application that sends messages to Kafka.
+- Broker : it is a Kafka server where data is stored. These servers together form a Kafka cluster. 
+- Topic : A Topic is like a named category/channel where messages are stored
+- Partition : allows Kafka to process data in parallel.
+- Consumer : A Consumer is an application that reads messages from Kafka.
+
+Kafka is a distributed  platform made of brokers (Kafka servers) that store data in topics. 
+Each topic is split into partitions. Producers write records to partitions; consumers read records from partitions
+
+Durability : Kafka put data to disk and replicates it across multiple brokers, ensuring no data loss in case broker fails
+Scalability: Kafka scales horizontally, allowing you to add more brokers to handle more data
+Message Ordering: Kafka guarantees message ordering(order sequecence) within a single partition but not across partitions.
+Fault Tolerance: Kafka replicates data across brokers, ensuring that if a broker fails, the system can continue operating
+
+In sync replicas : ISR means the copies of a partition that are up to date with the main copy (leader). If the main copy fails, 
+Kafka can make one of these up-to-date copies the new main copy(new leader)

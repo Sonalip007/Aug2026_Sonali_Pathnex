@@ -1,0 +1,34 @@
+I have learned ELK today 
+Spend 2 hours in reading 
+3 hours in watchong video
+1 hour for practicle
+
+100 Servers -- Anything wrong -- ssh into server - see failure logs - time consuming- dashboard gives more visibilty
+Logstash : collects, filters, and sends data to Elasticsearch. in structured format - filebeat
+Now imagine 100 Pods producing thousands/millions of logs. Finding one particular error manually would be painful.
+Elasticsearch : gives us a central searchable place, it commonly exposes its HTTP API on:9200
+Elasticsearch uses Apache Lucene as its underlying search and indexing library
+It uses shards to distrubute its load so it helpful in scaling, storage, search performance, parallel processing
+Kibana : A web-based interface for visualizing and exploring data stored in Elasticsearch
+
+ELK Stack Use Cases
+Log Management, Real-Time Analytics, Security Monitoring : Create alerts based on patterns or thresholds.
+Application Performance Monitoring, Business Intelligence: kibana visualize business metrics, such as sales performance, customer
+interactions & other KPI's
+it uses Elastic Security to enable features like user authentication, encryption, and role-based access control (RBAC)
+
+Challenges : Data Volume: over period huge data - manage using - scalling nodes, shards management, index rotation
+Query complexity : Complex queries may slow down performance. narrowdown the data 1st & then filter
+Cluster Managemenet : Running a large Elasticsearch cluster requires good knowledge of node management, 
+backup strategies, and disaster recovery
+
+Total Shards in cluster : P(R+1)shards primary, replica
+Minimum Node required : R+1 
+Max node Failures tolerated = R
+estimated primary shards : Total Data Size/Target Shard size (distributing data )
+
+Index lifecycle in elastic search, without this 
+- Indices grows indefinitely, Storage become expensive, performance degrades, manual cleanup required 
+- It automates Rollover, shrink, Move to cheaper storage, Delete old data
+Hot phase, Warm Phase, Cold Phase, Frozen Phase, Delete Phase
+
