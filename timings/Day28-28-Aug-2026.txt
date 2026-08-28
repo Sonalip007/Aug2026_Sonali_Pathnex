@@ -1,0 +1,164 @@
+3 hours : learned SSL & TLS
+1 hour : Practical
+2 hours : watched previous video
+
+Secure Sockets Layer : SSL is a security technology that protects the communication between your computer and a server.
+SO when you open a website SSL/TLS makes this communication secure.
+Without security: Someone who manages to intercept the communication could potentially see sensitive information.
+An SSL certificate helps prove that you are communicating with the correct server and allows the connection to be encrypted.
+With SSL/TLS: The communication is encrypted.
+
+-Imagine you are sending a private letter to your friend. You don't want someone sitting in between you and your friend to:
+Read the letter 👀, Change the letter ✏️ Pretend to be your friend 🎭
+SSL helps create a secure connection between two systems.
+
+
+Q.What does SSL actually provide?
+1. Encryption 🔐
+It converts readable information into protected/encrypted information while it travels.
+2. Authentication 
+SSL/TLS helps you verify: "Am I really communicating with the correct server?"
+3. Data Integrity : SSL/TLS helps ensure that the data wasn't modified while travelling.
+for eg. you send transfer Rs1,000 the attacker shouldn't be silently able to chnage it to Rs10,000. TLS includes mechanisms that help detect tampering.
+
+Q.What is SSL certificate : think it as of Digital ID card
+Server
+  |
+  ↓
+Digital Certificate
+  |
+  ├── Who is this server?
+  ├── Which domain does it belong to?
+  ├── Who issued the certificate?
+  └── When does it expire?
+  The certificate helps to prove : "This server is the legitimate server for this identity/domain."
+  
+-SSL vs TLS (TLS = Transport Layer Security) : Modern systems use TLS, not the old SSL protocols. but ppl commonly say "SSL certificate"
+you often hear SSL certificate But technically, modern systems generally use TLS, not the old SSL protocols.
+-So when someone says: "We need an SSL certificate" they usually mean: "We need a certificate for a TLS-secured connection."
+You have probably seen:http://example.com  & https://example.com
+-The S in HTTPS means the connection uses HTTP over TLS. So HTTPS = HTTP communication protected by TLS.
+
+Q.Who issues certificate ?
+Certificates are generally issued by trusted organizations called: Certificate Authorities (CA) ex. Digicert, Let's Encrypt, Global Sign
+Think of a CA like a trusted authority that verifies identities and signs certificates.
+Your browser/operating system already contains a list of trusted root CAs.
+
+-we can create our own certificate as well called Self-signed certificate
+But the browser will usually say: ⚠️ Certificate not trusted... beacuse that certificate can be used internally. 
+because nobody trusted your certificate authority.
+The CA isn't the only entity capable of technically creating a certificate. CAs are trusted authorities whose signatures
+browsers and operating systems recognize
+
+Creating a Self-Signed SSL Certificate procedure: 
+OpenSSL installed (default on most Linux/macOS; install manually on Windows)
+• Terminal/command prompt access
+
+1. Generate a Private Key
+bash
+openssl genrsa -out mysite.key 2048
+
+2. Generate a Certificate Signing Request (CSR) <- this is like filling form
+bash
+openssl req -new -key mysite.key -out mysite.csr
+Fill in details like:
+• Common Name (use localhost or your dev domain)
+• Country, State, Org, etc.
+
+3. Generate the Self-Signed Certificate
+bash
+openssl x509 -req -days 365 -in mysite.csr -signkey mysite.key -out
+mysite.crt
+
+You now have:
+• mysite.key – your private key
+• mysite.crt – your certificate
+
+The one who create certificate, it has private key always.
+You can use it for internal access only. Not trusted by browsers by default (causes warnings).Not recommended for public-facing websites
+
+
+-So if certificate expired, your browser will say Your connection is not private or NET::ERR_CERT_DATE_INVALID
+it basically saying "This certificate is no longer valid, so I cannot confidently trust it."
+
+Q.How HTTPS/TLS Connection Happens
+Client                         Server
+  |                              |
+  | ------ ClientHello --------> |
+  |                              |
+  | <----- ServerHello --------- |
+  |                              |
+  | <------ Certificate -------- |
+  |                              |
+  | ---- Verification -------->  |
+  |                              |
+  | === Secure session setup === |
+  |                              |
+  | 🔐 Encrypted communication  |
+  | <==========================> |
+  
+Step 1 : Client says: “I want to establish a secure connection.”
+Step 2 : Server responds with its TLS information and certificate.
+Step 3 : Client verifies the certificate.
+
+It checks things such as:
+Is it expired?
+Is the domain correct?
+Is the certificate trusted?
+Is the certificate chain valid?
+
+Step 4 : The client and server establish cryptographic keys for the session.
+Step 5 : Now application data can be exchanged securely.
+
+- Symmetric vs Asymmetric Encryption:
+Asymmetric : Uses Public Key & Private Key - Useful for authentication/key establishment.
+ Symmetric : Uses a shared Session Key - Once the secure session is established, symmetric cryptography is 
+generally used because it is much faster for bulk data.
+
+Q What is mTLS?
+
+Normal TLS:
+Client ───────→ Server
+        Server
+      authenticates
+
+mTLS:
+
+Client ───────→ Server
+   ↕              ↕
+Certificate    Certificate
+
+Both sides prove their identity.
+Simple explanation:
+TLS: “Server, prove who you are.”
+mTLS: “Server, prove who you are, and I'll prove who I am too.”
+
+=================In short  ===========
+SSL is secured Socket layer & TLS is Transport Layer Security
+What is SSL : SSL is older security protocol. Nowdays SSL replaced by TLS & it is used by modern systems
+
+Why Do We Need SSL/TLS? 
+Suppose you are trying to login in to server with ID/Password. Now if someone is able to see this communication while travelling 
+is not safe. So you need to encrypt your data. SSL/TLS protects data while it travels between systems
+HTTPS is HTTP carried over a TLS-secured connection
+
+How it works:
+Client say Hello, Server say Hello(with certi+Public Key) then Client Generate shared key. Key exchange takes place
+Once the handshake is complete, application data is transmitted using the secure TLS connection
+
+What does TLS provides?
+1. Encryption 🔐 : It converts readable information into protected/encrypted information while it travels.
+2. Authentication : SSL/TLS helps you verify: "Am I really communicating with the correct server?"
+3. Data Integrity : SSL/TLS helps ensure that the data wasn't modified while travelling.
+for eg. you send transfer Rs1,000 the attacker shouldn't be silently able to change it to Rs10,000. 
+TLS includes mechanisms that help detect tampering.
+
+What is an SSL/TLS Certificate? digital identity card for a server. helps establish identity and trust
+Who Issues the Certificate : Certificate Authority (CA) e.g. Let's Encrypt, DigiCert,GlobalSign
+
+What Happens When Certificate Expires?
+Certificate validation can fail, causing browsers or clients to warn or reject the connection.
+Your connection is not private or NET::ERR_CERT_DATE_INVALID
+User wont be able to access application even if it is healthy
+
+
