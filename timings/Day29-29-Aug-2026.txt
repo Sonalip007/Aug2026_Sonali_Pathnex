@@ -1,0 +1,41 @@
+3 hours : learned SSL & TLS
+1 hour : Practical
+2 hours : watched previous video
+
+SRE : Site Reliability engineering. goal of an SRE team is: Keep applications reliable, available, fast, and stable.
+Imagine an online shopping website like Amazon.
+Customers expect:
+Website should always work ✅, Payments should not fail ✅
+Pages should load quickly ✅, No downtime ✅
+If website crashes, User can not place orders & company loses money 
+The team responsible for ensuring the system remains healthy and reliable is often the SRE team.
+
+What does an SRE do?
+1. Monitoring : Checks CPU,Memory, Disk Usage, Application error, Response time tools: Prometheus, Grafana, ELK, Datadog  etc
+e.g if CPU>90%, Memory>80%, Error Rate Increasing then SRE creates alert before user notice problems
+2. Incident management  : Suppose database is down Users See 500 Internal server Error 
+In this case SRE will Find issue, Restore service, Coordinate with teams & perform RCA
+3. Automation : Instead of manual work:login in to 50server & restart them, Team automates task using Ansible, Terraform
+4. Reliability: SRE focuses on High Availability, Auto-scaling, Disaster recovery. If server Fail Traffic auto goes to another server
+5. Change Management : Safely deploying changes to production systems
+6. Improve Postmartem Culture : Why did this happen, and how can we prevent it from happening again?
+
+SLA : Service Level Agreement : Promise made to customer by sales/buisness Team  e.g. 99.9% uptime
+SLO : Service Level Objective : Internal target. SLO is always set less that SLA agreed
+SLI : Service Level Indicator): A metric used to measure the reliability
+
+Error Budget: If your SLO is: 99.9%, Allow downtime : 0.1%
+If the error budget is exhausted: SRE's reposibility is Stop new feature releases & Focus on reliability
+SRE will be always part of CAB meeting (Change advisory board)
+
+Hard Freeze & Cold Freeze : Hard Freeze : Complete freeze on all changes to the system. No deployments, no configuration changes
+Used During Critical events like Product launch, Holidays or high Traffic period. Implemented if error budget exceeds
+Cold Freeze: Partial Freeze - where essential changes (e.g., security patches) are allowed Used in maintenance windows or lower-risk periods
+
+Mindset and Culture
+• Blameless culture: Focus on learning, not punishing, after incidents
+• Collaboration with developers: SREs are often embedded in dev teams
+• Engineering-first approach: SREs write code, not just operate systems
+
+In Site Reliability Engineering (SRE), the 5 W's typically refer to key questions that help in
+understanding and solving problems related to system reliability
