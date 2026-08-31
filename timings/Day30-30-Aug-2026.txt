@@ -1,0 +1,41 @@
+4 hours : learned SSL & TLS
+1 hour : Practical & code writing
+3 hours : watched previous video
+
+DevopSecOps Tools: : Shift Left Security (Move security towards left, check as early as possible)
+Development + Security + Operations: In traditional development, security check might happen at the end. 
+but if anything fails inbetween we have to start again, test again. It say Don't wait until the end
+A vulnerability is a weakness or security hole in a system that an attacker could potentially use to cause harm.
+1. SAST : Static Application Security Testing. Check source code for security vulnerabilities before the application runs
+SonarQube(analyze code for bug), Semgrep(Fast, Syntax aware code scanner), Bandit (Python), ESLint + Security Plugins (Java)
+2. SCA — Now imagine your code itself is fine. But your application uses libraries written by other users 
+Snyk( find Vulnerability in Docker Images), Trivy (Scan code,container &IaC), RetireJS (Javascript Libary vulnerability scanner)
+3. Secret Scanning : If you accidently commits Key, Passwords, Token while git commit
+Common tools: Gitleaks, GitGuardian
+4. Container Scanning : Once Your code passed security checks. You build a Docker image, 
+But docker image contains more than your code So we need Container Scanning
+Trivy, Clair, Anchore Engine (inspect container & images), Docker Bench for Security (check Docker Host & Config)
+Now let's move to your Terraform.
+5. IaC (Infrastructure as Code) Security : Detects misconfigurations in Terraform, Kubernetes YAML, etc.
+e.g. your config accidentally allows: internet --> Port 22 - dangerous. Better to detect it before terraform create infrastructure
+Terrascan, tfsec, TFLint, KICS, Checkov
+6. Kubernetes Security:  Now your application reaches EKS. Your Kubernetes YAML can also contain security problems
+Kubescape (find security problems), Kyverno (enforce security policies), Falco (detect suspicious activities at runtime)
+7. DAST: Dynamic Application Security Testing - Find Runtime vulnerabilities
+Tool behaves somewhat like an external tester looking for security weaknesses.
+OWASP ZAP(Sacnner for web application),Burp Suite, Nikto(detect outdated server), Arachni (Ruby-based web scanner)
+8. Cloud Security : Now let's say your application is running in AWS
+You may have security issues with IAM, S3, EC2, EKS, Security Groups
+Tools: Inspector, GuardDuty, Security Hub
+9. Image Signing: How do you know Image deployed by you is Trusted image to build? for this image is digitally signed
+Using CoSign tool Think about a physical document. You sign it ("This document came from me.")
+10. Secrets Management & Detection : Protects sensitive data like API keys, passwords, and tokens.
+HashiCorp Vault, Gitleaks(scans Git repositories/files), TruffleHog(search repositories for credentials), CyberArk Conjur
+
+RTO: Recovery Tiem objective : Think of a database crash.
+RTO answers: How quickly must the system come back online? e.g.
+
+RPO = Recovery Point Objective : Tell How much data can we afford to lose? Example:
+Database crashes at 10:00 AM Last backup = 9:45 AM You lose 15 minutes of data. So RPO = 15 minutes. 
+
+
